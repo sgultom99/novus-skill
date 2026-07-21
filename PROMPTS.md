@@ -51,7 +51,7 @@ cheap moment.
 First run:
 
 ```
-Create a skeptical <segment, e.g. Indonesian bank customer> persona to test
+Create a skeptical <segment, e.g. bank customer in your target market> persona to test
 <demo URL> (login <demo creds>) and give brutal feedback. She must remember her
 evaluations across sessions. (The skeptical-evaluator skill defines the file layout.)
 ```

@@ -87,11 +87,13 @@ memory/ = rolling ledger · docs/handover/ = session handovers · docs/ = PRDs, 
 - `.claude/agent-memory/<agent>/MEMORY.md` — persistent memory for persona subagents.
 
 **Persona subagents** in `.claude/agents/*.md`, two flavors:
-- Adversarial critics: `skeptical-bank-customer` ("Ibu Ratna Wijaya"), `skeptical-indonesian-prospect`, `ux-product-critic`
-- Domain experts: `banking-qa-domain-expert`, `fintech-solution-architect`, `workflow-qa-indonesia`
+- Adversarial critics: `skeptical-bank-customer` (a named persona grounded in your
+  target market), `skeptical-prospect`, `ux-product-critic`
+- Domain experts: `banking-qa-domain-expert`, `fintech-solution-architect`,
+  `workflow-qa-<market>`
 
-They accumulate findings across sessions in agent-memory (per-locale review notes for
-id/my/vn/th/lk/ph). See the skeptical-evaluator skill.
+They accumulate findings across sessions in agent-memory (one review-notes file per
+locale where the product localizes). See the skeptical-evaluator skill.
 
 **docs/ structure:** dated filenames (`2026-07-19-<topic>.md`) inside category folders:
 `deploy/ security/ strategy/ research/ handover/ integration/ requirements/ finale/ demo/`.
