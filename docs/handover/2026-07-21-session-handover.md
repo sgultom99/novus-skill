@@ -7,7 +7,7 @@ teammate playbook (README, PROMPTS, BUSINESS-USER-CHECKLIST), skill source (`ski
 six TDD-verified skills), and installable plugin marketplace (`novustech` /
 `novus-skills`, versionless = every push is a new version). All shared content is now
 **general and international** — no product brands, no country/persona/locale specifics,
-no portfolio or session-history provenance, no personal benchmark products (see
+no product-line or session-history provenance, no personal benchmark products (see
 `memory/project_content-policy.md`).
 
 ## Done this session
@@ -20,7 +20,7 @@ no portfolio or session-history provenance, no personal benchmark products (see
   and documented install + per-skill use cases in README §6.
 - Dropped the AWS plugin from setup; `telegram` + `frontend-design` marked optional.
 - Content scrub across README/PROMPTS/skills (commits `11ad7d5`…`a3295f3`): neutral
-  intro, fictional §8 examples, internationalized personas, "fintech" removed,
+  intro, fictional §8 examples, internationalized personas, niche keywords removed,
   detailed five-slot goal prompt (§4 ②) with domain-generic benchmark guidance and
   worked banking/card examples.
 
