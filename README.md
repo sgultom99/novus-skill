@@ -122,10 +122,29 @@ Copy-paste templates for every step live in [PROMPTS.md](PROMPTS.md).
 > Learn this project first: read CLAUDE.md, memory/MEMORY.md, and the latest
 > docs/handover/ doc, then tell me where we left off.
 
-**② One dense goal prompt.** Bundle in a single message: the goal, a real product to
-benchmark ("like hyperswitch.io/intelligent-routing", "like Termius"), which repo/folder
-to learn first, the deploy target, and the access you grant ("you can run bash / SSH /
-spawn agents"). Quality bar words that actually steer output: *realistic, enterprise,
+**② One dense goal prompt.** Bundle five slots into a single message — every slot you
+leave out becomes a wrong guess Claude makes for you:
+
+1. **Goal** — what to build and for whom, in one clause with the core flows named.
+2. **Benchmark** — a real product that is the quality bar, *from your own domain*, with
+   its URL. Building a card-management portal? Benchmark the best issuer console you
+   know. A mobile banking app? The leading digital bank in your market. Claude studies
+   what you point at — pick the product you actually want to be compared to.
+3. **Learn first** — the repo/folder/doc to read before writing anything.
+4. **Deploy target** — where it ships (staging URL, cluster, "runs locally only").
+5. **Access granted** — what it may do without asking ("you can run bash / SSH /
+   spawn agents").
+
+Worked example (card-service use case):
+
+> /goal I want a card-management portal for our issuing bank — cardholders view
+> transactions, block/unblock cards, set spend limits, dispute a charge — like
+> <the best card-management app in your market, with URL> -- learn first from
+> docs/PRD.md and the existing api/ folder -- ships to the staging cluster behind
+> our SSO -- make it realistic, enterprise, production-ready, monochrome near-flat
+> UI -- I allow you bash shell execution and you can spawn agents
+
+Quality bar words that actually steer output: *realistic, enterprise,
 production-ready, monochrome near-flat, not fancy AI-bot look*.
 
 **③ Plan gate.** "write the plan" → review → "approved". Plans are chunked into phases

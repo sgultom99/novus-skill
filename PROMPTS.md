@@ -23,6 +23,17 @@ near-flat UI (no fancy AI-bot look) -- I allow you bash shell execution and
 you can spawn agents; run it directly, I'll add the permission
 ```
 
+Pick the benchmark from YOUR domain — the product you want to be compared to
+(banking app, card console, payment gateway dashboard…). A filled example:
+
+```
+/goal I want a corporate internet-banking approval module — maker/checker flows,
+transaction limits, audit trail — like <top corporate banking portal in your
+market, with URL> -- learn first from docs/requirements/ -- ships to staging
+behind SSO -- make it realistic, enterprise, production-ready, monochrome
+near-flat UI -- I allow you bash shell execution and you can spawn agents
+```
+
 ## 3. Plan gate → phased execution
 
 ```
