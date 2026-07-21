@@ -1,15 +1,14 @@
 # Vibecode 101 — Santo's Claude Code Playbook
 
-Onboarding guide for teammates joining the novustech company product portfolio
-(contact-center, workflow automation, SSO, payment links, KYC/identity, terminal
-tooling, retail payments, and payment routing).
+A practical Claude Code playbook: setup, project conventions, the prompting loop, and
+six installable house skills.
 
-**Non-technical builder (C-level / head-level) who vibecoded a product and wants it in
-real production?** Skip to [BUSINESS-USER-CHECKLIST.md](BUSINESS-USER-CHECKLIST.md) —
-the mandatory handoff checklist so DevOps can take over, modify, and deploy. Engineers:
-keep reading here, and [PROMPTS.md](PROMPTS.md) has the copy-paste prompt loop. Everything here
-was extracted from the real setup in `~/.claude` and the real session history of ~11
-shipped projects (June–July 2026). Copy this setup and you inherit the whole workflow.
+- **Engineers:** start at section 1; [PROMPTS.md](PROMPTS.md) has the copy-paste
+  prompt loop.
+- **Non-technical builders (C-level / head-level)** who vibecoded a product and want it
+  in real production: go straight to
+  [BUSINESS-USER-CHECKLIST.md](BUSINESS-USER-CHECKLIST.md) — the mandatory handoff
+  checklist so DevOps can take over, modify, and deploy.
 
 ---
 
