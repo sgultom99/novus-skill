@@ -86,7 +86,12 @@ with just the handover. (The session-handover skill defines the exact files.)
 
 - `/model` — Fable 5 for planning, strategy, hard debugging; Opus 4.8 for bulk
   implementation. You can also route per-subagent: "spawn a Fable 5 agent for the
-  plan, Opus 4.8 agents for implementation."
+  plan, Opus 4.8 agents for implementation, Sonnet agents for verification and the
+  persona QA re-runs, Haiku agents for the file inventory."
+- Subagent routing rule of thumb: judgement-heavy → Fable 5 / Opus 4.8;
+  well-specified checking (verify a deploy, re-run a persona with its memory,
+  simulate a test) → Sonnet; mechanical fan-out (list/grep/format across many
+  files) → Haiku.
 - `/effort` — `max` for hard problems, default `xhigh` otherwise.
 - `/usage` — check burn rate; save a handover before the weekly cap hits.
 - `/compact` — survive marathon sessions; safe because the docs are the real memory.

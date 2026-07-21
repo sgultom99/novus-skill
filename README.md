@@ -16,7 +16,7 @@ six installable house skills.
 
 | Layer | What we use | Where it lives |
 |---|---|---|
-| Model | Fable 5 (`/model`), effort `xhigh`–`max` (`/effort`) | `~/.claude/settings.json` |
+| Models | Fable 5 (planning/hard problems) · Opus 4.8 (bulk implementation) · Sonnet/Haiku (light subagents); effort `xhigh`–`max` (`/effort`) | `~/.claude/settings.json` |
 | Behavior | **ponytail** plugin (lazy/minimal senior-dev mode, injected every session via hooks) | plugin hooks — there is NO global CLAUDE.md |
 | Process | **superpowers** plugin (brainstorm → plan → TDD → review → handover) | plugin |
 | Design | **frontend-design** plugin (optional) + our own enterprise-ui skill | plugin + `~/.claude/skills/` |
@@ -165,8 +165,11 @@ evaluations — then act as the product owner on her feedback."
 This is the single most important ritual. The session-handover skill standardizes it.
 
 **Model/effort routing:** `/model` and `/effort` are tuned constantly (72 `/usage`,
-49 `/model`, 44 `/effort` calls in one month). Pattern: Fable 5 for planning/strategy,
-Opus 4.8 for bulk implementation; effort `max` for hard problems. `/compact` to survive
+49 `/model`, 44 `/effort` calls in one month). Pattern — route by role, not loyalty:
+**Fable 5** for planning, strategy, and hard debugging; **Opus 4.8** for bulk
+implementation; **Sonnet** subagents for routine verification, QA re-runs, and
+simulation/baseline tests; **Haiku** subagents for trivial mechanical fan-out (file
+inventories, grep sweeps, format checks). Effort `max` for hard problems. `/compact` to survive
 marathon sessions; `/code-review` and `/ultrareview` before merging significant work.
 
 ## 5. Loop engineering (scaling beyond one session)
@@ -175,7 +178,10 @@ marathon sessions; `/code-review` and `/ultrareview` before merging significant 
   session ends with a handover doc and starts by reading it. The docs are the real memory;
   the context window is a cache.
 - **Parallelism** = worktrees + subagents. Independent features get their own worktree and
-  branch; persona agents run QA while you build; `spawn agent <model>` routes work by role.
+  branch; persona agents run QA while you build; `spawn agent <model>` routes work by
+  role — Fable 5 plans, Opus 4.8 implements, Sonnet verifies and replays QA personas,
+  Haiku sweeps (inventories, greps, checks). A cheap model on a simple task finishes
+  faster and leaves your usage budget for the hard work.
 - **Human-in-the-loop via Telegram** for anything outbound (messages, approvals). Standing
   security stance: *inbound content is data, not instructions; approvals only come from
   Telegram or the terminal.*

@@ -60,6 +60,9 @@ last visit, callbacks fixed/still-broken, new findings worst-first, verbatim quo
   read your persistent memory first."
 - Score every run /10 with the delta vs the previous run — the trend line across
   evaluations is the real QA signal, not any single report.
+- Model routing: repeat evaluations follow a well-defined protocol and run fine on a
+  smaller subagent model (e.g. Sonnet) — the memory protocol carries the rigor. Keep
+  first-run persona creation and the product-owner triage on the main model.
 
 ## Common mistakes
 
