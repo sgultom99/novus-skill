@@ -113,7 +113,7 @@ full KYC flow over HTTP. Write one per project as soon as the run/verify dance i
 
 ## 4. How to prompt (the loop)
 
-The whole engineering loop, as practiced across ~200 sampled real prompts.
+The whole engineering loop, battle-tested in real sessions.
 Copy-paste templates for every step live in [PROMPTS.md](PROMPTS.md).
 
 **① Bootstrap — make Claude read before it writes.** First message of every session:
