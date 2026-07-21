@@ -1,7 +1,6 @@
 # Prompt Cookbook — the loop, ready to copy-paste
 
-Cleaned-up templates of the prompts actually used across the novustech portfolio
-(mined from ~200 real session prompts, June–July 2026). Replace `<...>` slots.
+Cleaned-up templates of prompts proven in real sessions. Replace `<...>` slots.
 Typos are fine — Claude parses intent — but never paste a live secret (see README §7).
 
 ## 1. Session bootstrap (first message, every session)
