@@ -89,8 +89,7 @@ memory/ = rolling ledger · docs/handover/ = session handovers · docs/ = PRDs, 
 **Persona subagents** in `.claude/agents/*.md`, two flavors:
 - Adversarial critics: `skeptical-bank-customer` (a named persona grounded in your
   target market), `skeptical-prospect`, `ux-product-critic`
-- Domain experts: `banking-qa-domain-expert`, `fintech-solution-architect`,
-  `workflow-qa-<market>`
+- Domain experts: `qa-domain-expert`, `solution-architect`, `workflow-qa-<market>`
 
 They accumulate findings across sessions in agent-memory (one review-notes file per
 locale where the product localizes). See the skeptical-evaluator skill.

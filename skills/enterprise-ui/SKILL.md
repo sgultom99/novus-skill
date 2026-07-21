@@ -62,4 +62,4 @@ spec first; it is cheaper than the rework.
 | `border-radius: 12px` card + heavy shadow | 6px + 1px border |
 | Brand-colored focus glow rings | 1px accent border on focus, at most a 2px pale ring |
 | Decorative illustration/emoji in empty states | Plain text + one action button |
-| "Trust-inspiring" navy/gold fintech theming | Monochrome; the product's data is the design |
+| "Trust-inspiring" navy/gold theming | Monochrome; the product's data is the design |
