@@ -1,0 +1,9 @@
+{
+  "name": "novus-skills",
+  "description": "Novus team house skills: session-handover, skeptical-evaluator, enterprise-ui, secret-hygiene, production-handoff, and the novus-design-system frontend skill with bundled tokens.css and Carlito fonts",
+  "author": {
+    "name": "Santo Gultom",
+    "email": "santo.gultom08@gmail.com"
+  },
+  "repository": "https://github.com/sgultom99/novus-skill"
+}

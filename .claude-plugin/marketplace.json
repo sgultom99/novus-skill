@@ -1,0 +1,20 @@
+{
+  "name": "novustech",
+  "owner": {
+    "name": "Santo Gultom",
+    "email": "santo.gultom08@gmail.com"
+  },
+  "description": "Novus team skills: vibecoding playbook house skills plus the Novus design system",
+  "plugins": [
+    {
+      "name": "novus-skills",
+      "source": "./",
+      "description": "Six house skills: session-handover, skeptical-evaluator, enterprise-ui, secret-hygiene, production-handoff, novus-design-system (with bundled design tokens and fonts)",
+      "author": {
+        "name": "Santo Gultom"
+      },
+      "repository": "https://github.com/sgultom99/novus-skill",
+      "keywords": ["skills", "design-system", "handover", "qa", "security"]
+    }
+  ]
+}
