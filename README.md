@@ -293,6 +293,26 @@ not even negated). The living master stays in the design-system SharePoint folde
 
 ## 8. Where to look for living examples
 
+### In this repo — real files, open them now
+
+vibecode101 was itself built with the exact workflow it teaches — the plugins from §2
+(superpowers drove the plan gate and the TDD skill loop, ponytail kept everything
+minimal), the model routing from §4 (every skill's RED baseline and GREEN verification
+ran as a Sonnet simulation subagent), and the rituals from §5. So the repo doubles as
+its own living example:
+
+| Pattern | Real file in this repo | How it was made |
+|---|---|---|
+| Dated session handover | `docs/handover/2026-07-21-session-handover.md` | the `session-handover` skill, invoked with "save the session" |
+| Memory ledger + topic notes | `memory/MEMORY.md` → `memory/project_skills.md`, `memory/project_content-policy.md` | same teardown ritual |
+| TDD-built skills | `skills/*/SKILL.md` (six of them) | `superpowers:writing-skills`: RED baseline subagent fails → write skill → GREEN verify → close loopholes |
+| Skill bundling heavy assets | `skills/novus-design-system/` (SKILL.md + `tokens.css` + `fonts/`) | heavy-reference skill layout — assets ship beside the SKILL.md |
+| Plugin marketplace manifests | `.claude-plugin/marketplace.json` + `plugin.json` | `claude plugin validate .` passes; versionless = every push is a release |
+| Machine-local settings kept out of git | `.gitignore` | excludes `.claude/settings.local.json` |
+| The build log itself | `git log --oneline` | the commit sequence IS the loop: ship → verify → scrub → handover |
+
+### In your product repos — the layout to expect
+
 Illustrative layout only — the repo names below are made up. Every mature novustech
 project follows these patterns; ask Santo which internal repo best demonstrates each.
 
