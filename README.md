@@ -20,9 +20,8 @@ shipped projects (June–July 2026). Copy this setup and you inherit the whole w
 | Model | Fable 5 (`/model`), effort `xhigh`–`max` (`/effort`) | `~/.claude/settings.json` |
 | Behavior | **ponytail** plugin (lazy/minimal senior-dev mode, injected every session via hooks) | plugin hooks — there is NO global CLAUDE.md |
 | Process | **superpowers** plugin (brainstorm → plan → TDD → review → handover) | plugin |
-| Design | **frontend-design** plugin + our own enterprise-ui skill | plugin + `~/.claude/skills/` |
-| Messaging | **telegram** plugin (MCP bridge, human-in-the-loop approvals) | plugin + `~/.claude/channels/telegram/` |
-| Cloud | **aws-startup-advisor** plugin (2 MCP servers: AWS knowledge + pricing) | plugin |
+| Design | **frontend-design** plugin (optional) + our own enterprise-ui skill | plugin + `~/.claude/skills/` |
+| Messaging | **telegram** plugin (optional — MCP bridge, human-in-the-loop approvals) | plugin + `~/.claude/channels/telegram/` |
 | Memory | per-project `memory/MEMORY.md` ledgers + `.claude/agent-memory/` + handover docs | in each repo |
 | Skills | 6 house skills distilled from real history (section 6) | `novus-skills` plugin from this repo's marketplace |
 
@@ -38,7 +37,8 @@ to memory/handover docs.
    /plugin marketplace add anthropics/claude-plugins-official
    /plugin marketplace add DietrichGebert/ponytail
    /plugin marketplace add forrestchang/andrej-karpathy-skills   # optional
-   /plugin install superpowers ponytail telegram frontend-design aws-startup-advisor
+   /plugin install superpowers ponytail
+   /plugin install frontend-design telegram   # optional: UI quality / chat approvals
    ```
 3. In `~/.claude/settings.json` set effort high and (optionally) the ponytail statusline.
    Ponytail default mode is `full`; switch with `/ponytail lite|full|ultra`, disable with
