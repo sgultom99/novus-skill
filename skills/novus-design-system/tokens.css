@@ -1,0 +1,1391 @@
+/* ============================================================================
+   NOVUS DESIGN SYSTEM — tokens.css
+   Single source of truth for the Novus visual system (machine-readable).
+   THREE SOURCES OF TRUTH, KEPT IN LOCKSTEP (LOCKED): this tokens.css + brand.html
+   (human-readable visual guide) + Novus_Context.md (working context). Every amendment
+   or locked decision MUST be captured in ALL THREE in the same change — never one alone.
+   Essence: Trusted · Precise · Inclusive · Enduring
+   Anchor:  a calm 24/7 operations floor — mastery without drama.
+   Modes:   light is HOME; dark is re-tuned (not inverted) for app screens.
+
+   RULES
+   - Components reference SEMANTIC ROLE tokens (--bg, --text, --accent, …),
+     never raw scale values. Define a value once; reference it everywhere.
+   - Provenance: [OBSERVED] = taken from the logo / existing apps.
+                 [INFERRED] = extended for a full system (confirm/adjust freely).
+   - AA contrast floor checked per mode. Tune modes independently.
+
+   APP-INTERFACE RULES (added 2026-06-25)
+   - APP GROUND is always --bg (white in light); never ground a page on --bg-subtle /
+     neutral-50 (#F4F7FA) — it reads as a faint green tint beside white cards.
+   - DARK-MODE TEXT: never pair a hardcoded dark hex text colour with a token surface
+     (var(--surface)/--bg…); it becomes dark-on-dark in dark mode. Use the *-text role
+     tokens (--accent-text/--success-text/--danger-text). Fixed light-tint chips (fixed
+     light bg + fixed dark text) are fine in both modes.
+   - ELEVATION ON WHITE: overlaid cards rest on --shadow-2 and rise to --shadow-3 on hover
+     (shadow-1 is invisible on white). Resting shadow on all cards; hover lift only on
+     clickable cards (see affordance rule).
+   - LOGO IN DARK: show the WHITE master lockup in dark, colour in light — via the
+     .brandlogo--light/.brandlogo--dark swap (section 4b). NEVER set inline display on the
+     logo <img>s; inline style defeats the swap.
+   - COLOUR DISCIPLINE: blue (--accent) is the default accent; green is success/status only,
+     never a page or panel ground. One accent per view.
+   - TRAFFIC-LIGHT STATUS (added 2026-06-27): metric boxes carry status colour to show health.
+     NEUTRAL for descriptive/actual data (targets, booked actuals, raw counts); GREEN (--success) =
+     positive / on-track trend or forecast; AMBER (--warning) = at-risk / watch; RED (--danger) =
+     alert / breach. Apply as a 4px left accent on metric cards, a top accent + low-alpha tinted
+     header on grouped/quarter cards, and always pair with a one-line legend. Never colour a
+     pure-data box — colour signals a judgement (trend/forecast/risk), not a number.
+   - WEIGHTED CATEGORICAL PICKERS (added 2026-06-27): when a dropdown/picker's options carry an
+     inherent weight, probability or score (sales stages, confidence tiers, etc.), order the
+     options by that weight in progression order (low→high / funnel order) — never alphabetical
+     or object-key order — and show the weight inline as a % next to each label (e.g. "Proposal
+     (60%)"). Keep the <option value> as the bare key so saving/calculation are unaffected; the
+     % is display guidance only. Mirror the same order + % anywhere that category is shown.
+   - CW LABELS (added 2026-06-27): a calendar-week label always shows the week-START date for
+     orientation — format "CWnn (D Mon)", e.g. CW27 (29 Jun) — everywhere a CW appears
+     (badges, tables, pickers, history). Derive the Monday of the ISO week.
+   - RISK / ALERT MESSAGES (added 2026-06-27): any textual risk, alert or warning message is
+     shown in RED (--danger) — red text or a red-tinted / red-left-border box — so risks read
+     instantly. Distinct from the traffic-light metric-health colouring (amber may flag an
+     at-risk metric); an explicit risk/alert MESSAGE is always red.
+   - SELF-DESCRIBING CHIPS (added 2026-06-27): metric chips/badges prefix the field name so each
+     reads standalone — e.g. "Stage · Lead · 30%", "Intelligence Score · 15% · Upside". For
+     opportunity/pipeline apps the confidence metric is the transparent stage-based INTELLIGENCE
+     SCORE (stage weight ± update-cadence & action progress), never a subjective probability.
+   - TOKEN-DRIVEN STYLING (added 2026-06-27): every design value — colour, spacing, radius, type,
+     shadow — references a tokens.css variable or a component class; never ad-hoc literals. Apps
+     inline the FULL token set (incl. --radius-*) so the same vars are available everywhere; new
+     UI is built from tokens (e.g. the nav Back button → .navback uses --line/--bg-muted/--radius-md).
+   - MOBILE-FIRST (LOCKED, added 2026-07-02): design mobile FIRST, scale up. Base CSS targets the
+     phone; larger screens layer with min-width queries (never max-width overrides). Test at 375px
+     baseline (not 1440), touch targets >=44px, thumb-reach nav/drawers/sheets, type via clamp()
+     tuned small-first, NO hover-only interactions (hover is a bonus, tap is the path). Core
+     open/close of menus, disclosures and modals must NOT depend on JS where a native mechanism
+     exists — prefer <details>/<summary>, a checkbox+<label> drawer, and :target sheets, so UI still
+     works if JS fails (fixed the iOS-Safari burger). Verify 375/768/desktop, light+dark, JS on+off.
+     When desktop-pretty vs mobile-usable conflict, mobile wins.
+   - OFFICE DOCUMENT DELIVERABLES (LOCKED, added 2026-07-06): every generated Word/PDF
+     deliverable (reports, memos, evaluations — any .docx/.pdf produced in any project) is
+     styled FROM THESE TOKENS, read fresh in the producing session — never from memory of the
+     brand. Colour map: headings/accent --blue-500; deep headings & emphasis --blue-700
+     (--accent-text); body text --neutral-900; secondary/muted --neutral-600; table header
+     fill --blue-500 with --text-on-accent; row/panel tints --blue-50 or --neutral-50
+     (TABLE HEADERS: a solid --blue-500 fill is for AT MOST ONE hero table — multi-table
+     documents use TINTED headers per §13.B);
+     severity/status text --red-600 (--danger-text) / --amber-700 (--warning-text) /
+     --green-700 (--success-text). NO ad-hoc hex anywhere. Typeface is Carlito, and the TTFs
+     from fonts/ttf/ MUST be EMBEDDED in every .docx (macOS ships neither Carlito nor
+     Calibri — an un-embedded file silently substitutes fonts on any machine without Carlito;
+     naming the font in the file is NOT compliance, embedding is). Logos are the official
+     assets from logos/ placed at size parity — never retyped. Bullets use the hanging-indent
+     › convention. Render and visually verify before delivery.
+   - BACK NAVIGATION (added 2026-07-02): a single global ◀ Back reliably returns to the previous
+     state from ANY screen and never dead-ends. Don't use raw history.back() (it ignores modals).
+     Drive an explicit in-app VIEW STACK: every navigation goes through one _go(view) (push current
+     snapshot, close any open modal, apply new view); goBack() closes an open modal first, else pops
+     the stack; mirror browser/hardware back into goBack() and keep a history buffer so it never exits.
+   - DASHBOARD CHARTS (added 2026-06-30): charts are styled, never stock/Excel-like. Set Chart.js
+     global defaults once — token font, ROUNDED bars (borderRadius on the top stack segment only),
+     thin SOFT dashed gridlines (~13% alpha), NO axis border / tick marks, dark rounded tooltips,
+     constrained bar thickness (maxBarThickness, categoryPercentage≈0.62). A primary time-series
+     shows TWO reads: composition (stacked bars) AND trajectory (a thin line across period totals).
+     Charts must reflect REAL data — bucket revenue by its actual billing/close month (dealBM/leadQ),
+     never smear an annual figure evenly across periods. Flag anomalies with a HOLLOW-STICK marker:
+     a dashed average reference line + on any period beyond ±18% of the mean an outlined (hollow,
+     white-filled) point + capped stick + outlined pill with signed % vs avg (▲ --green up-spike,
+     ▼ --red drop); quiet total label on non-flagged periods.
+   - INSIGHT / SIGNAL CARDS (added 2026-06-30): for leadership/exec views whose goal is a
+     JUDGEMENT (not data lookup), lead with plain-language signal cards, not a chart to decode.
+     Card = uppercase eyebrow (signal type) + headline finding with the number emphasised
+     + sub-line stating the risk + traffic-light left accent (rule 9) + optional SMALL support
+     visual (mini bars / chips, never the main event). Most-severe first; open with a one-line
+     verdict summarising the red signals. Prefer over a chart whenever the chart would just be
+     re-read into a sentence.
+   - APP SCREENS ship a persisted [data-theme] light/dark toggle that defaults to the OS
+     (prefers-color-scheme); single-file/offline apps inline these tokens and embed Carlito.
+   - HEADER & NAV SHELL: the top bar and nav are full-bleed (bg + hairline span the viewport)
+     but their inner content aligns to the same centered column as <main> — every app shares
+     one content width, var(--container) = 1200px, side padding var(--gutter). Use
+     .appbar/.appbar__inner + .appnav/.appnav__inner, or the
+     .appbar--pad / .appnav--pad fallback. Never let the logo/menu float to the window edge.
+   - LOGO SIZE: the Novus master lockup is --logo-height (26px) in every app — same official
+     asset, same height, one step smaller than the app name (the primary identifier). No
+     per-app responsive shrink; tune once via --logo-height. The header lockup is ALWAYS the
+     official asset — never let a per-app uploaded/custom-logo setting (e.g. a saved SET.logo
+     in localStorage) override it; that silently desyncs the brand across apps.
+   ========================================================================== */
+
+/* ----------------------------------------------------------------------------
+   1. RAW SCALES  (the palette — referenced only by the role layer below)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Novus Blue — [OBSERVED] logo primary #0070C0 */
+  --blue-50:#EAF3FB; --blue-100:#D2E5F5; --blue-200:#A6CCEC; --blue-300:#6FACDE;
+  --blue-400:#338ACE; --blue-500:#0070C0; --blue-600:#015FA3; --blue-700:#00457A;
+  --blue-800:#073355; --blue-900:#0E2336;
+
+  /* Signal Green — SCREEN-TUNED UI green #00A04A (banking / success); logo ink is --logo-green #00B050 */
+  --green-50:#E6F6EC; --green-100:#C5EAD2; --green-200:#94D6AC; --green-300:#54BD7E;
+  --green-400:#1FAA5E; --green-500:#00A04A; --green-600:#0B8A45; --green-700:#0A6E38;
+  --green-800:#0A552C; --green-900:#093F22;
+
+  /* Amber — SCREEN-TUNED UI amber #E8A300 (retail / warning); logo ink is --logo-gold #F8C000 */
+  --amber-50:#FCF3DF; --amber-100:#F7E2B0; --amber-200:#F0CB72; --amber-300:#E8B53A;
+  --amber-400:#E8A300; --amber-500:#D29400; --amber-600:#B97F00; --amber-700:#8A5E00;
+  --amber-800:#664500; --amber-900:#4A3300;
+
+  /* Danger Red — [OBSERVED] carried from apps #C0473F */
+  --red-50:#FBEAE9; --red-100:#F3C9C6; --red-200:#E6938C; --red-300:#D56A61;
+  --red-400:#C0473F; --red-500:#A3322B; --red-600:#8A2823; --red-700:#6E201C;
+  --red-800:#551815; --red-900:#3F110F;
+
+  /* Indigo — [OBSERVED] NovaAI identity #534AB7 (product accent only) */
+  --indigo-50:#EEEDFE; --indigo-100:#DAD7FA; --indigo-200:#B7B1F0; --indigo-300:#8E84E0;
+  --indigo-400:#6A5FCB; --indigo-500:#534AB7; --indigo-600:#3C3489; --indigo-700:#2E2769;
+  --indigo-800:#221C4E; --indigo-900:#181436;
+
+  /* Orange — Novaboost identity (Talent & Managed Services); --400 = logo ink #E87830.
+     Uses the 4th locked logo ink as a product accent (completes blue/green/gold/orange).
+     --700 is the on-light text step (~7.5:1 on white); --300 is the on-dark text step. */
+  --orange-50:#FCEEE4; --orange-100:#F9D9C2; --orange-200:#F3B78C; --orange-300:#F0A56E;
+  --orange-400:#E87830; --orange-500:#D46420; --orange-600:#B5511A; --orange-700:#8A3E14;
+  --orange-800:#66300F; --orange-900:#4A230B;
+
+  /* LOGO INKS (LOCKED) — the actual master-logo colours, for exact-match / print use.
+     Ground-truth brand inks. The UI accent tokens are deliberately SCREEN-TUNED and
+     differ slightly (chosen for on-screen legibility); see notes on green/amber below. */
+  --logo-blue:#0070C0; --logo-green:#00B050; --logo-gold:#F8C000; --logo-orange:#E87830;
+
+  /* Cool neutrals — [INFERRED] blue-leaning grey ramp ("control-room") */
+  --neutral-0:#FFFFFF; --neutral-50:#F4F7FA; --neutral-100:#E9EEF4; --neutral-200:#DCE3EB;
+  --neutral-300:#C3CDD8; --neutral-400:#9AA7B5; --neutral-500:#6B7886; --neutral-600:#51606F;
+  --neutral-700:#3A4754; --neutral-800:#1C2A38; --neutral-900:#0E2336; --neutral-950:#0B1620;
+}
+
+/* ----------------------------------------------------------------------------
+   2. SEMANTIC ROLE LAYER — LIGHT (HOME MODE)
+   Components use ONLY these. Switching mode re-dresses everything at once.
+   -------------------------------------------------------------------------- */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Grounds & surfaces */
+  --bg:               var(--neutral-0);
+  --bg-subtle:        var(--neutral-50);
+  --bg-muted:         var(--neutral-100);
+  --surface:          var(--neutral-0);
+  --surface-raised:   var(--neutral-0);
+  --scrim:            rgba(14,35,54,.55);   /* modal/drawer backdrop (role token) */
+
+  /* Text */
+  --text:             var(--neutral-900);   /* AA: ~16:1 on bg */
+  --text-secondary:   var(--neutral-600);   /* AA: ~6.6:1 */
+  --text-muted:       var(--neutral-500);   /* AA large / UI */
+  --text-on-accent:   #FFFFFF;              /* AA on --accent */
+
+  /* Borders & lines */
+  --border:           var(--neutral-200);
+  --border-strong:    var(--neutral-300);
+
+  /* Accent (interactive) — Novus Blue. White text passes AA (~4.7:1). */
+  --accent:           var(--blue-500);
+  --accent-hover:     var(--blue-600);
+  --accent-active:    var(--blue-700);
+  --accent-subtle:    var(--blue-50);       /* tinted backgrounds */
+  --accent-panel:     var(--accent-subtle); /* LARGE tinted panel fill — light: pale accent tint.
+                                               dark: retuned to a clean surface (see dark blocks),
+                                               NEVER a translucent accent (amber/green over navy = mud). */
+  --accent-text:      var(--blue-700);      /* links/text on light (~8:1) */
+
+  /* Status — solid / text / tint per role */
+  --success:var(--green-500); --success-text:var(--green-700); --success-subtle:var(--green-50);
+  --warning:var(--amber-400); --warning-text:var(--amber-700); --warning-subtle:var(--amber-50);
+  --danger: var(--red-400);   --danger-text: var(--red-600);   --danger-subtle: var(--red-50);
+  --info:   var(--blue-500);  --info-text:   var(--blue-700);  --info-subtle:   var(--blue-50);
+
+  /* Focus */
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);
+
+  /* Elevation — soft in light (raised = subtle shadow) */
+  --shadow-1: 0 1px 2px rgba(14,35,54,.06), 0 1px 1px rgba(14,35,54,.04);
+  --shadow-2: 0 2px 8px rgba(14,35,54,.08), 0 1px 2px rgba(14,35,54,.05);
+  --shadow-3: 0 12px 28px rgba(14,35,54,.12), 0 4px 8px rgba(14,35,54,.06);
+}
+
+/* ----------------------------------------------------------------------------
+   3. SEMANTIC ROLE LAYER — DARK (re-tuned for app screens; NOT an inversion)
+   Grounds are deep blue-slate; raised surfaces grow LIGHTER, not darker.
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg:               var(--neutral-950);   /* #0B1620 */
+  --bg-subtle:        #0F1E2B;
+  --bg-muted:         #14273A;
+  --surface:          #122131;
+  --surface-raised:   #18293B;              /* lighter = raised in dark */
+  --scrim:            rgba(0,0,0,.62);       /* modal/drawer backdrop (role token) */
+
+  --text:             #E7EDF3;              /* AA: ~14:1 on bg */
+  --text-secondary:   #AEBCC9;              /* AA: ~7:1 */
+  --text-muted:       #8597A6;
+  --text-on-accent:   #FFFFFF;
+
+  --border:           #2A3B4D;
+  --border-strong:    #3A4D60;
+
+  --accent:           var(--blue-500);      /* button bg; white text still AA */
+  --accent-hover:     #1E84CF;
+  --accent-active:    var(--blue-400);
+  --accent-subtle:    rgba(59,154,224,.16);
+  --accent-panel:     var(--surface-raised); /* dark: clean raised surface, NOT a translucent
+                                                accent fill (identity comes from the accent border). */
+  --accent-text:      #7CC0EE;              /* links on dark (AA ~7:1) */
+
+  --success:#2BB266; --success-text:#5FCB86; --success-subtle:rgba(43,178,102,.16);
+  --warning:#E8A300; --warning-text:#F0B43A; --warning-subtle:rgba(232,163,0,.16);
+  --danger: #D56A61; --danger-text: #F0A39C; --danger-subtle: rgba(213,106,97,.16);
+  --info:   var(--blue-400); --info-text:#7CC0EE; --info-subtle:rgba(59,154,224,.16);
+
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent-active) 55%, transparent);
+
+  /* Elevation in dark = lighter surface + soft ambient, minimal shadow */
+  --shadow-1: 0 1px 2px rgba(0,0,0,.40);
+  --shadow-2: 0 2px 10px rgba(0,0,0,.45);
+  --shadow-3: 0 14px 34px rgba(0,0,0,.55);
+}
+
+/* Honor OS preference when no explicit choice is set.
+   DARK-MODE PARITY (LOCKED): this media query must re-tune the colour TOKENS *and*
+   carry mirrors of every `[data-theme="dark"] X` component rule (logo→white,
+   two-shade-blue product/platform lockups, map pins, bullet markers) scoped to
+   `:root:not([data-theme]) X`. A device merely SET to dark — or the JS-less file
+   preview — must look identical to the toggled state. Never rely on the toggle alone. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg:var(--neutral-950); --bg-subtle:#0F1E2B; --bg-muted:#14273A;
+    --surface:#122131; --surface-raised:#18293B;
+    --text:#E7EDF3; --text-secondary:#AEBCC9; --text-muted:#8597A6; --text-on-accent:#FFFFFF;
+    --border:#2A3B4D; --border-strong:#3A4D60;
+    --accent:var(--blue-500); --accent-hover:#1E84CF; --accent-active:var(--blue-400);
+    --accent-subtle:rgba(59,154,224,.16); --accent-panel:var(--surface-raised); --accent-text:#7CC0EE;
+    --success:#2BB266; --success-text:#5FCB86; --success-subtle:rgba(43,178,102,.16);
+    --warning:#E8A300; --warning-text:#F0B43A; --warning-subtle:rgba(232,163,0,.16);
+    --danger:#D56A61; --danger-text:#F0A39C; --danger-subtle:rgba(213,106,97,.16);
+    --info:var(--blue-400); --info-text:#7CC0EE; --info-subtle:rgba(59,154,224,.16);
+    --shadow-1:0 1px 2px rgba(0,0,0,.40); --shadow-2:0 2px 10px rgba(0,0,0,.45); --shadow-3:0 14px 34px rgba(0,0,0,.55);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   4. PRODUCT ACCENTS — master + family (apply class to any scope)
+   Re-skins --accent role only; everything else stays the shared Novus core.
+   -------------------------------------------------------------------------- */
+/* Product / platform accents. Lockup wordmark is SOLID-SET (LOCKED): "nova"+suffix are
+   contiguous (no space — "novapay", never "nova pay"); the two-tone colour split alone
+   separates them, only the pictograph sits apart. Enforced in HTML by wrapping nm+sf in a
+   single .wm span; in the PNG assets/generator (slide-template/build/gen_lockups.py) likewise. */
+.theme-novus    { --accent:var(--blue-500);   --accent-hover:var(--blue-600);   --accent-active:var(--blue-700);   --accent-subtle:var(--blue-50);   --accent-text:var(--blue-700); }
+.theme-novapay  { --accent:var(--blue-500);   --accent-hover:var(--blue-600);   --accent-active:var(--blue-700);   --accent-subtle:var(--blue-50);   --accent-text:var(--blue-700); }
+.theme-novabank { --accent:var(--green-500);  --accent-hover:var(--green-600);  --accent-active:var(--green-700);  --accent-subtle:var(--green-50);  --accent-text:var(--green-700); }
+.theme-novastore{ --accent:var(--amber-400);  --accent-hover:var(--amber-600);  --accent-active:var(--amber-700);  --accent-subtle:var(--amber-50);  --accent-text:var(--amber-700); }
+.theme-novatrust{ --accent:var(--blue-800);   --accent-hover:var(--blue-700);   --accent-active:var(--blue-900);   --accent-subtle:var(--blue-50);   --accent-text:var(--blue-800); }
+.theme-novaai   { --accent:var(--indigo-500); --accent-hover:var(--indigo-600); --accent-active:var(--indigo-700); --accent-subtle:var(--indigo-50); --accent-text:var(--indigo-600); }
+.theme-novaboost{ --accent:var(--orange-400); --accent-hover:var(--orange-500); --accent-active:var(--orange-600); --accent-subtle:var(--orange-50); --accent-text:var(--orange-700); }
+/* Dark-mode product accents — lighter, AA on dark grounds */
+[data-theme="dark"] .theme-novus,[data-theme="dark"] .theme-novapay{--accent-text:var(--blue-300);--accent-subtle:rgba(59,154,224,.16);}
+[data-theme="dark"] .theme-novabank{--accent-text:var(--green-300);--accent-subtle:rgba(43,178,102,.16);}
+[data-theme="dark"] .theme-novastore{--accent-text:var(--amber-300);--accent-subtle:rgba(232,163,0,.16);}
+[data-theme="dark"] .theme-novatrust{--accent-text:var(--blue-300);--accent-subtle:rgba(59,154,224,.16);}
+[data-theme="dark"] .theme-novaai{--accent-text:var(--indigo-300);--accent-subtle:rgba(83,74,183,.22);}
+[data-theme="dark"] .theme-novaboost{--accent-text:var(--orange-300);--accent-subtle:rgba(232,120,48,.16);}
+
+/* Product & platform LOCKUPS — bare pictograph inline with the name, same height.
+   All-lowercase. 'nova' (.nm) in light blue; pictograph + suffix (.sf) in --accent-text.
+   Products carry a product theme class; platform layers use the default (deep blue
+   on light / light blue on dark); novaai carries .theme-novaai. */
+.vlogo{display:flex;align-items:center;gap:.5rem;}
+.vlogo .vmark{height:1.7rem;width:1.7rem;flex:0 0 auto;fill:none;stroke:var(--accent-text);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;}
+.wm{font-weight:var(--weight-bold);font-size:var(--text-xl);line-height:1;}
+.wm .nm{color:var(--blue-400);} .wm .sf{color:var(--accent-text);}
+/* Novaboost lockup EXCEPTION (light): the mark + 'boost' suffix use the VIVID logo-orange
+   ink (--accent #E87830) per brand-owner direction, not the darker --accent-text. Body
+   text/links in .theme-novaboost still use --accent-text (orange-700) for AA. Placed BEFORE
+   the dark block so the LOCKED all-blue dark lockup rule below still wins in dark mode. */
+.theme-novaboost .vlogo .vmark{stroke:var(--accent);}
+.theme-novaboost .wm .sf{color:var(--accent);}
+/* Dark mode (LOCKED): EVERY product & platform lockup renders in two shades of light blue.
+   The lockup = pictograph + name (1st-suffix 'nova' + 2nd-suffix). In dark:
+     - pictograph (.vmark) + 2nd-suffix (.sf) = --blue-300  (same light blue)
+     - 1st-suffix 'nova' (.nm)               = --blue-200  (a lighter blue)
+   Applies to ALL verticals AND platform modules, incl. novaai. Light mode keeps
+   each component's identity colour (green/amber/deep-blue/indigo). On the web build,
+   platform pictographs live under .arch-lockup/.arch-ai — include those ancestors there. */
+[data-theme="dark"] .wm .nm{color:var(--blue-200);}
+[data-theme="dark"] .wm .sf{color:var(--blue-300);}
+[data-theme="dark"] .vlogo .vmark{stroke:var(--blue-300);}
+
+/* ----------------------------------------------------------------------------
+   4b. LOGO ASSETS — master lockup + sub-brand 'novus' wordmark variant
+   The MASTER lockup (novus + TECHNOLOGIES) is the default brand signature.
+   The WORDMARK variant ('novus' only, no TECHNOLOGIES) is for sub-brand /
+   secondary elements where the Novus parent is already established or the
+   master lockup is too tall (e.g. the reverse of collateral). NEVER retype the
+   wordmark — reference an asset token. Pick the treatment by BACKGROUND
+   (all in logos/, trimmed to equal content bounds so equal height = equal size):
+     colour → light / neutral grounds (default)
+     white  → dark, blue or photographic grounds
+     blue   → light grounds needing a single brand colour
+     black  → one-colour / mono print on light grounds
+   -------------------------------------------------------------------------- */
+:root{
+  /* Master lockup (novus + TECHNOLOGIES) — official 6-colour set, source of truth in
+     01_Brand_Assets/New Novus Logo Variants, trimmed copies live in logos/.
+     Colour treatments: colour #full-palette · blue #006FBF · green #05AF4E ·
+     grey #757070 · black #000000 · white #FFFFFF. */
+  --logo-master-colour: url("logos/Novus_Logo_Colour_transparent.png");
+  --logo-master-blue:   url("logos/Novus_Logo_Blue_transparent.png");
+  --logo-master-green:  url("logos/Novus_Logo_Green_transparent.png");
+  --logo-master-grey:   url("logos/Novus_Logo_Grey_transparent.png");
+  --logo-master-black:  url("logos/Novus_Logo_Black_transparent.png");
+  --logo-master-white:  url("logos/Novus_Logo_White_transparent.png");
+  /* Sub-brand 'novus' wordmark (no TECHNOLOGIES) — same 6 treatments */
+  --logo-wordmark-colour: url("logos/Novus_Logo_Colour_wordmark_transparent.png");
+  --logo-wordmark-blue:   url("logos/Novus_Logo_Blue_wordmark_transparent.png");
+  --logo-wordmark-green:  url("logos/Novus_Logo_Green_wordmark_transparent.png");
+  --logo-wordmark-grey:   url("logos/Novus_Logo_Grey_wordmark_transparent.png");
+  --logo-wordmark-black:  url("logos/Novus_Logo_Black_wordmark_transparent.png");
+  --logo-wordmark-white:  url("logos/Novus_Logo_White_wordmark_transparent.png");
+  /* Product vertical & platform pictographs (currentColor; compose into lockups
+     with Carlito — see brand.html. Organised catalogue: 01_Brand_Assets/Novus Logos/). */
+  --logo-product-novapay:   url("logos/icons/novapay.svg");
+  --logo-product-novabank:  url("logos/icons/novabank.svg");
+  --logo-product-novastore: url("logos/icons/novastore.svg");
+  --logo-product-novatrust: url("logos/icons/novatrust.svg");
+  --logo-product-novaboost: url("logos/icons/novaboost.svg");
+  --logo-platform-novahub:  url("logos/icons/novahub.svg");
+  --logo-platform-novaware: url("logos/icons/novaware.svg");
+  --logo-platform-novaserve:url("logos/icons/novaserve.svg");
+  --logo-platform-novaai:   url("logos/icons/novaai.svg");
+
+  /* Pre-tinted raster pictographs (PNG, transparent) — for engines that can't render
+     SVG/currentColor (e.g. PowerPoint). Stroke = each product's --accent-text. Generated
+     from the SVGs above by slide-template/build/gen_pictograms.py. Use the SVG above where SVG works. */
+  --logo-product-novapay-png:   url("logos/icons/png/novapay.png");
+  --logo-product-novastore-png: url("logos/icons/png/novastore.png");
+  --logo-product-novabank-png:  url("logos/icons/png/novabank.png");
+  --logo-product-novatrust-png: url("logos/icons/png/novatrust.png");
+  --logo-platform-novaai-png:   url("logos/icons/png/novaai.png");
+  --logo-platform-novahub-png:  url("logos/icons/png/novahub.png");
+  --logo-platform-novaware-png: url("logos/icons/png/novaware.png");
+  --logo-platform-novaserve-png:url("logos/icons/png/novaserve.png");
+
+  /* Full LOCKUP images (pictograph + two-tone wordmark, transparent PNG) — ready to
+     drop onto a slide; generated by slide-template/build/gen_lockups.py. These are the
+     copy-paste "brand strip" assets (see §12). */
+  --logo-lockup-novapay:   url("logos/lockups/novapay.png");
+  --logo-lockup-novabank:  url("logos/lockups/novabank.png");
+  --logo-lockup-novastore: url("logos/lockups/novastore.png");
+  --logo-lockup-novatrust: url("logos/lockups/novatrust.png");
+  --logo-lockup-novaai:    url("logos/lockups/novaai.png");
+  --logo-lockup-novahub:   url("logos/lockups/novahub.png");
+  --logo-lockup-novaware:  url("logos/lockups/novaware.png");
+  --logo-lockup-novaserve: url("logos/lockups/novaserve.png");
+
+  /* Title-slide background (white logo + orbit/markets, baked from the corp deck;
+     the editable headline placeholder sits over it). See §12 Title layout. */
+  --asset-title-bg: url("logos/title_bg_white.png");
+
+  /* PowerPoint deliverables (see §12) */
+  --asset-pptx-template: url("slide-template/pptx/Novus_Template.potx");
+  --asset-pptx-lockups:  url("slide-template/pptx/Novus_Brand_Lockups.pptx");
+}
+
+/* Brand-lockup HEIGHT (LOCKED criterion, 2026-06-25): the Novus master lockup sits at
+   --logo-height — ~1.4x the app-name size, deliberately one step SMALLER than the app
+   name so the app name stays the primary identifier and Novus reads as the endorsing
+   parent. SAME official asset + SAME height in every app. No per-app responsive shrink. */
+:root{ --logo-height:26px; }
+
+/* Master-lockup IMAGE swap (LOCKED): colour logo in light, WHITE logo in dark.
+   Markup: two <img> tagged .brandlogo--light / .brandlogo--dark with NO inline display
+   (inline display overrides these rules and breaks the swap). Height comes from --logo-height. */
+.brandlogo--light,.brandlogo--dark{height:var(--logo-height);width:auto;}
+.brandlogo--light{display:block;} .brandlogo--dark{display:none;}
+[data-theme="dark"] .brandlogo--light{display:none;} [data-theme="dark"] .brandlogo--dark{display:block;}
+[data-theme="light"] .brandlogo--light{display:block;} [data-theme="light"] .brandlogo--dark{display:none;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme]) .brandlogo--light{display:none;} :root:not([data-theme]) .brandlogo--dark{display:block;} }
+
+/* APP SHELL (LOCKED): the header bar and the nav are FULL-BLEED (background + bottom
+   hairline span the viewport) but their INNER content aligns to the same centered content
+   column as <main> — width var(--container), side padding var(--gutter). Use the inner
+   wrappers below, or the --pad fallback when you cannot add a wrapper element. */
+.appbar,.appnav{background:var(--surface);border-bottom:1px solid var(--border);}
+.appbar__inner{max-width:var(--container);margin-inline:auto;padding-inline:var(--gutter);width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);min-height:56px;}
+.appnav__inner{max-width:var(--container);margin-inline:auto;padding-inline:var(--gutter);display:flex;gap:var(--space-1);overflow-x:auto;}
+.appmain{max-width:var(--container);margin-inline:auto;padding-inline:var(--gutter);}
+.appbar--pad,.appnav--pad{padding-inline:max(var(--gutter),calc((100% - var(--container))/2 + var(--gutter)));}
+/* Brand lockup beside the app name: logo subordinate, app name is the primary identifier. */
+.brandlock{display:flex;align-items:center;gap:var(--space-3);}
+.brandlock .appname{font-weight:var(--weight-bold);font-size:var(--text-xl);line-height:1;}
+
+/* ----------------------------------------------------------------------------
+   5. TYPOGRAPHY  —  Carlito (LOCKED Novus face) → Calibri (Office twin) → system
+   Carlito is the PRIMARY face: metric-IDENTICAL to Calibri, open-source, free to
+   embed — so it renders the same on macOS, Windows, web and print, with no
+   "Calibri is missing" substitution ever again (macOS ships no Calibri). The
+   @font-face block self-hosts it (fonts/) so any file referencing tokens.css
+   carries the face with it. Calibri stays only as a same-metrics fallback for
+   legacy Office installs.
+   -------------------------------------------------------------------------- */
+@font-face{font-family:"Carlito";font-style:normal;font-weight:400;font-display:swap;
+  src:url("fonts/carlito-latin-400-normal.woff2") format("woff2");}
+@font-face{font-family:"Carlito";font-style:normal;font-weight:700;font-display:swap;
+  src:url("fonts/carlito-latin-700-normal.woff2") format("woff2");}
+:root {
+  --font-sans: Carlito, Calibri, -apple-system, "Segoe UI", system-ui, Arial, sans-serif;
+  --font-serif: Cambria, "Source Serif 4", Georgia, serif;   /* long-form documents */
+  --font-mono: Consolas, "Cascadia Mono", ui-monospace, Menlo, monospace; /* data/figures */
+
+  /* Type scale (px / line-height). Base 16. */
+  --text-xs:   .75rem;   --lh-xs:1rem;
+  --text-sm:   .875rem;  --lh-sm:1.25rem;
+  --text-base: 1rem;     --lh-base:1.5rem;
+  --text-md:   1.125rem; --lh-md:1.75rem;
+  --text-lg:   1.25rem;  --lh-lg:1.75rem;
+  --text-xl:   1.5rem;   --lh-xl:2rem;
+  --text-2xl:  1.875rem; --lh-2xl:2.25rem;
+  --text-3xl:  2.25rem;  --lh-3xl:2.5rem;
+  --text-4xl:  3rem;     --lh-4xl:3.25rem;
+  --text-display: 3.75rem; --lh-display:3.9rem;
+
+  /* Weights — Carlito/Calibri ship 400 & 700; 600 falls back to 700. */
+  --weight-regular:400; --weight-medium:600; --weight-bold:700;
+  --tracking-tight:-0.01em; --tracking-normal:0; --tracking-wide:0.02em;
+}
+
+/* ----------------------------------------------------------------------------
+   6. SPACE · RADIUS · OPACITY · MOTION · LAYOUT
+   -------------------------------------------------------------------------- */
+:root {
+  --space-0:0; --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem;
+  --space-5:1.5rem; --space-6:2rem; --space-7:3rem; --space-8:4rem; --space-9:6rem;
+
+  --radius-sm:6px; --radius-md:8px; --radius-lg:12px; --radius-xl:16px; --radius-pill:999px;
+
+  --opacity-disabled:.45; --opacity-muted:.7;
+
+  --ease-out:cubic-bezier(.2,.6,.2,1); --ease-in-out:cubic-bezier(.4,0,.2,1);
+  --dur-fast:120ms; --dur:180ms; --dur-slow:260ms;
+
+  --container:1200px; --container-narrow:760px; --gutter:1.5rem; --grid-cols:12;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast:0ms; --dur:0ms; --dur-slow:0ms; }
+  * { animation-duration:.001ms !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
+}
+
+/* ----------------------------------------------------------------------------
+   7. BASE ELEMENTS
+   -------------------------------------------------------------------------- */
+*,*::before,*::after { box-sizing:border-box; }
+html { -webkit-text-size-adjust:100%; }
+body {
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:var(--font-sans); font-size:var(--text-base); line-height:var(--lh-base);
+  font-weight:var(--weight-regular);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+h1,h2,h3,h4 { font-weight:var(--weight-bold); color:var(--text); letter-spacing:var(--tracking-tight); margin:0 0 var(--space-3); }
+h1 { font-size:var(--text-4xl); line-height:var(--lh-4xl); }
+h2 { font-size:var(--text-2xl); line-height:var(--lh-2xl); }
+h3 { font-size:var(--text-xl);  line-height:var(--lh-xl); }
+h4 { font-size:var(--text-lg);  line-height:var(--lh-lg); }
+p  { margin:0 0 var(--space-4); max-width:68ch; }
+a  { color:var(--accent-text); text-underline-offset:2px; }
+a:hover { text-decoration:underline; }
+small { font-size:var(--text-sm); color:var(--text-secondary); }
+code,kbd,samp { font-family:var(--font-mono); font-size:.9em; }
+hr { border:0; border-top:1px solid var(--border); margin:var(--space-6) 0; }
+
+/* Always-visible focus (accessibility floor) */
+:where(a,button,input,select,textarea,[tabindex]):focus-visible {
+  outline:2px solid transparent; box-shadow:var(--focus-ring); border-radius:var(--radius-sm);
+}
+
+/* ----------------------------------------------------------------------------
+   8. COMPONENTS  (reference tokens only — never raw values)
+   -------------------------------------------------------------------------- */
+
+/* Buttons */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--space-2);
+  font:inherit; font-weight:var(--weight-medium); line-height:1; white-space:nowrap;
+  padding:.625rem 1.1rem; border-radius:var(--radius-md); border:1px solid transparent;
+  cursor:pointer; transition:background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+  text-decoration:none;
+}
+.btn:active { transform:translateY(1px); }
+.btn--lg { padding:.8rem 1.4rem; font-size:var(--text-lg); }   /* hero CTAs */
+.btn--sm { padding:.4rem .75rem; font-size:var(--text-sm); }
+.btn--primary   { background:var(--accent); color:var(--text-on-accent); }
+.btn--primary:hover  { background:var(--accent-hover); box-shadow:var(--shadow-2); }
+.btn--primary:active { background:var(--accent-active); box-shadow:none; }
+.btn--secondary { background:transparent; color:var(--accent-text); border-color:var(--border-strong); }
+.btn--secondary:hover { background:var(--accent-subtle); border-color:var(--accent); }
+.btn--secondary:active { background:var(--accent-subtle); border-color:var(--accent-active); }
+.btn--ghost     { background:transparent; color:var(--accent-text); }
+.btn--ghost:hover { background:var(--accent-subtle); }
+.btn--ghost:active { background:var(--accent-subtle); }
+.btn--danger    { background:var(--danger); color:#fff; }
+.btn--danger:hover { filter:brightness(.95); box-shadow:var(--shadow-2); }
+.btn--danger:active { filter:brightness(.9); box-shadow:none; }
+.btn[disabled],.btn[aria-disabled="true"] { opacity:var(--opacity-disabled); pointer-events:none; }
+.btn[data-loading="true"]{ position:relative; color:transparent; }
+.btn[data-loading="true"]::after{
+  content:""; position:absolute; inset:0; margin:auto; width:1em; height:1em;
+  border:2px solid currentColor; border-top-color:transparent; border-radius:50%;
+  color:var(--text-on-accent); animation:novus-spin .7s linear infinite;
+}
+@keyframes novus-spin { to { transform:rotate(360deg); } }
+
+/* Form fields */
+.field { display:flex; flex-direction:column; gap:var(--space-2); margin-bottom:var(--space-4); }
+.field > label { font-size:var(--text-sm); font-weight:var(--weight-medium); color:var(--text-secondary); }
+.input, .select, .textarea {
+  font:inherit; color:var(--text); background:var(--surface);
+  border:1px solid var(--border-strong); border-radius:var(--radius-md);
+  padding:.5rem .75rem; width:100%;
+}
+.input:hover,.select:hover,.textarea:hover { border-color:var(--neutral-400); }
+.input:focus-visible { border-color:var(--accent); box-shadow:var(--focus-ring); outline:none; }
+.field--error .input { border-color:var(--danger); }
+.field__error { color:var(--danger-text); font-size:var(--text-sm); }
+.field__help  { color:var(--text-muted);  font-size:var(--text-sm); }
+
+/* Card & stat */
+.card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:var(--space-5); box-shadow:var(--shadow-1);
+}
+.card--raised { box-shadow:var(--shadow-2); }
+/* ── Interaction affordance (LOCKED): hover response = "this is clickable" ──
+   A hover state change (lift + raised shadow + accent border) is an AFFORDANCE
+   SIGNAL and is reserved for boxes that DO something on click (open a detail
+   modal or a form). Apply `.card--interactive` (or an equivalent per-component
+   rule) to every such box — products, Talent/Managed, white-paper cards,
+   industries, architecture layers + the novaai core, leadership cards — so they
+   all lift identically. NON-clickable boxes (info tiles like "Why Novus", case
+   cards, client/scheme logo tiles, the value-chain strip) must have NO hover
+   response — a static box that reacts is a false affordance. There is exactly
+   ONE hover treatment, and it always means "clickable". */
+.card--interactive { transition:transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+.card--interactive:hover { transform:translateY(-4px); box-shadow:var(--shadow-3); border-color:var(--accent); }
+.card--interactive:focus-within { border-color:var(--accent); box-shadow:var(--shadow-2); }
+
+/* Client / proof logo wall — uniform optical height, original FULL COLOUR at rest
+   (so partner marks aren't distorted), NON-clickable so NO hover response.
+   Compact tiles (dense columns, short height) to limit vertical scroll.
+   Tiles stay white so multi-colour client marks remain legible in dark mode. */
+.clientwall { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:var(--space-3); }
+.clogo { background:#fff; border:1px solid var(--border); border-radius:var(--radius-md); height:54px;
+  display:flex; align-items:center; justify-content:center; padding:8px 14px; }
+.clogo img { max-width:100%; max-height:30px; object-fit:contain; }
+
+/* Connectivity strip — national rails, QR networks & card schemes Novus connects to.
+   Full colour (recognition matters) on white tiles; NON-clickable so NO hover. Compact. */
+.schemewall { display:grid; grid-template-columns:repeat(auto-fill,minmax(104px,1fr)); gap:var(--space-3); }
+.slogo { background:#fff; border:1px solid var(--border); border-radius:var(--radius-md); height:46px;
+  display:flex; align-items:center; justify-content:center; padding:6px 12px; }
+.slogo img { max-width:100%; max-height:26px; object-fit:contain; }
+
+/* Leadership / team grid — round-photo + name + role cards. Each card is CLICKABLE
+   (opens a ~300-word bio modal), so it uses the standard lift affordance like every
+   other clickable box (see "Interaction affordance" above). Photos are round on a
+   white bg with a thin grey ring (.avatar--photo); monogram avatar is the fallback. */
+.leaders { display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:var(--space-4); }
+.leader { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-4);
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
+  width:100%; text-align:left; font:inherit; color:inherit; cursor:pointer;
+  transition:transform var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
+.leader:hover { transform:translateY(-4px); box-shadow:var(--shadow-3); border-color:var(--accent); }
+.leader:focus-visible { border-color:var(--accent); box-shadow:var(--shadow-2); }
+.leader .avatar { width:48px; height:48px; flex:0 0 auto; border-radius:50%;
+  background:var(--accent-subtle); color:var(--accent-text); display:flex; align-items:center;
+  justify-content:center; font-weight:var(--weight-bold); font-size:var(--text-sm); }
+.leader b { display:block; color:var(--text); line-height:1.2; }
+.leader span { display:block; color:var(--text-secondary); font-size:var(--text-sm); margin-top:.15rem; }
+
+/* Row utility — wrapping flex line for button/CTA groups */
+.row { display:flex; flex-wrap:wrap; gap:var(--space-3); align-items:center; }
+
+/* Value-chain strip — a horizontal sequence of labelled steps joined by "›" arrows
+   (e.g. Accept › Process › Control › Expand). These are INFORMATIONAL, non-clickable
+   boxes — per the affordance rule they have NO hover. Stacks vertically under ~620px. */
+.vchain-strip { display:flex; flex-wrap:wrap; align-items:stretch; gap:var(--space-2); }
+.vchain { flex:1 1 180px; border:1px solid var(--border); border-radius:var(--radius-md);
+  background:var(--surface); padding:var(--space-3) var(--space-4); }
+.vchain b { display:block; color:var(--text); }
+.vchain span { display:block; color:var(--text-secondary); font-size:var(--text-sm); margin-top:.15rem; }
+.vchain-arrow { display:flex; align-items:center; color:var(--accent-text); font-weight:var(--weight-bold); font-size:var(--text-lg); }
+@media (max-width:620px) { .vchain { flex:1 1 100%; } .vchain-arrow { display:none; } }
+
+/* Compact contact CTA — copy on the left, primary action on the right, on ONE row
+   (not stacked) to save vertical space. Stacks under 760px. The button is always the
+   primary "Talk to us" action (see brand.html: Primary CTA consistency). In the
+   current build this sits merged into the top of the footer (.foot-cta), divided
+   from the footer columns by a hairline rule. */
+.cta-row { display:flex; align-items:center; justify-content:space-between; gap:var(--space-6);
+  max-width:var(--container); margin-inline:auto; text-align:left; }
+.cta-row .btn { flex:0 0 auto; white-space:nowrap; }
+@media (max-width:760px) { .cta-row { flex-direction:column; align-items:flex-start; } }
+
+/* Sticky-nav anchor offset (LOCKED): the nav is sticky, so the scroll container
+   (html) must carry `scroll-padding-top` ≈ nav height (5rem) — otherwise in-page
+   jumps land under the header and hide the target section's title. */
+
+/* Section background rhythm (LOCKED): alternate plain ↔ tinted band down the page so
+   no two adjacent sections share the same ground — this is what visually DEFINES the
+   sections. Wrap a section in `.band` for the tinted ground; plain sections use the
+   bare surface. Hero is exempt. Re-check (and restore) the alternation whenever
+   sections are added, removed, merged or reordered. */
+
+/* Disclosure (progressive disclosure) — collapse secondary content behind a click
+   toggle; NOT hover (touch + a11y). Pair button[aria-expanded] with .collapse target. */
+.disclosure .disclosure-ic { display:inline-block; transition:transform var(--dur) var(--ease-out); }
+.disclosure[aria-expanded="true"] .disclosure-ic { transform:rotate(90deg); }
+.collapse { display:grid; grid-template-rows:0fr; transition:grid-template-rows var(--dur) var(--ease-out); }
+.collapse.is-open { grid-template-rows:1fr; }
+.collapse > * { overflow:hidden; min-height:0; visibility:hidden; transition:visibility var(--dur) var(--ease-out); }
+.collapse.is-open > * { visibility:visible; }
+
+/* ----------------------------------------------------------------------------
+   8b. SECOND-LEVEL / INTERACTION COMPONENTS  (lists, clickable cards, modals,
+       forms, leadership bios) — used for "click for more detail" patterns.
+   -------------------------------------------------------------------------- */
+
+/* Bulleted lists (LOCKED) — hanging indent: the marker sits in a fixed slot and
+   wrapped text aligns under the TEXT, never under the marker. Use for any bullets. */
+.bullets{list-style:none;padding:0;margin:0;display:grid;gap:.45rem;color:var(--text-secondary);font-size:var(--text-sm);}
+.bullets li{display:flex;gap:.45rem;align-items:baseline;}
+.bullets li::before{content:"\203A";color:var(--accent-text);font-weight:var(--weight-bold);flex:0 0 auto;}
+
+/* Clickable card — stretched-link overlay makes the whole card one accessible
+   target (real <button>: keyboard + focus ring). Card container needs position:relative. */
+.card-trigger{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;border-radius:inherit;cursor:pointer;}
+.card-trigger:focus-visible{outline:none;box-shadow:var(--focus-ring);}
+
+/* In-page detail modal — native <dialog> gives focus-trap, Esc, inert background. */
+dialog.vdialog{border:0;padding:var(--space-6);max-width:560px;width:calc(100% - 2*var(--gutter));border-radius:var(--radius-lg);background:var(--surface);color:var(--text);box-shadow:var(--shadow-3);}
+dialog.vdialog::backdrop{background:rgba(11,22,32,.55);backdrop-filter:blur(3px);}
+.vdialog__head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);}
+.vdialog__body h4{margin:var(--space-4) 0 var(--space-2);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:var(--tracking-wide);color:var(--text-muted);}
+.modal-close{border:0;background:transparent;color:var(--text-secondary);font-size:1.1rem;line-height:1;cursor:pointer;width:36px;height:36px;border-radius:var(--radius-md);flex:0 0 auto;}
+.modal-close:hover{background:var(--bg-subtle);color:var(--text);}
+
+/* Lead-capture form (in a dialog) — name / title / organisation / email / mobile. */
+.lead-form{display:grid;gap:var(--space-3);margin-top:var(--space-2);}
+.lead-form .field{display:flex;flex-direction:column;gap:.3rem;}
+.lead-form label{font-size:var(--text-sm);font-weight:var(--weight-medium);color:var(--text-secondary);}
+.lead-form input,.lead-form select,.lead-form textarea{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:.5rem .7rem;width:100%;}
+.lead-form input:focus-visible,.lead-form select:focus-visible,.lead-form textarea:focus-visible{outline:none;border-color:var(--accent);box-shadow:var(--focus-ring);}
+.lead-form input:user-invalid,.lead-form select:user-invalid{border-color:var(--danger);}
+
+/* Leadership bio header — round headshot on WHITE with a thin grey ring, or a
+   monogram fallback. Same round slot is used small on cards, large in the modal. */
+.bio-id{display:flex;align-items:center;gap:var(--space-3);}
+.bio-photo{width:64px;height:64px;flex:0 0 auto;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--border);}
+.vdialog .avatar{width:64px;height:64px;flex:0 0 auto;border-radius:50%;background:var(--accent-subtle);color:var(--accent-text);display:flex;align-items:center;justify-content:center;font-weight:var(--weight-bold);font-size:var(--text-base);}
+.avatar--photo{object-fit:cover;background:#fff;border:1px solid var(--border);}
+
+/* STAT / KPI cell. NO-OVERLAP RULE (LOCKED best practice): big numbers must never collide.
+   The value is white-space:nowrap (a figure like "120M+" must not wrap mid-token) AND the
+   cell is min-width:0 so it can shrink inside a flex/grid parent instead of overflowing into
+   its neighbour. Lay stats out with .statrow (an auto-fit grid whose min column ≥ the widest
+   number, so they REFLOW to fewer columns rather than overlap) — never a fixed multi-column
+   row that forces figures to touch. */
+.stat { display:flex; flex-direction:column; gap:var(--space-1); min-width:0; }
+.stat__value { font-size:var(--text-3xl); line-height:1.05; font-weight:var(--weight-bold); color:var(--text); white-space:nowrap; }
+.stat__label { font-size:var(--text-sm); color:var(--text-secondary); }
+/* Canonical stat layout — reflows instead of colliding. Reuse everywhere stats appear. */
+.statrow { display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); column-gap:var(--space-5); row-gap:var(--space-3); }
+.statrow--wide { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+
+/* Alerts / banners */
+.alert { display:flex; gap:var(--space-3); padding:var(--space-4); border-radius:var(--radius-md);
+  border:1px solid transparent; }
+.alert--info    { background:var(--info-subtle);    border-color:var(--info);    color:var(--info-text); }
+.alert--success { background:var(--success-subtle); border-color:var(--success); color:var(--success-text); }
+.alert--warning { background:var(--warning-subtle); border-color:var(--warning); color:var(--warning-text); }
+.alert--danger  { background:var(--danger-subtle);  border-color:var(--danger);  color:var(--danger-text); }
+
+/* Badge / status chip */
+.badge { display:inline-flex; align-items:center; gap:.375rem; padding:.125rem .5rem;
+  font-size:var(--text-xs); font-weight:var(--weight-medium); border-radius:var(--radius-pill);
+  background:var(--bg-muted); color:var(--text-secondary); border:1px solid var(--border); }
+.badge--accent  { background:var(--accent-subtle);  color:var(--accent-text);  border-color:transparent; }
+.badge--success { background:var(--success-subtle); color:var(--success-text); border-color:transparent; }
+.badge--warning { background:var(--warning-subtle); color:var(--warning-text); border-color:transparent; }
+.badge--danger  { background:var(--danger-subtle);  color:var(--danger-text);  border-color:transparent; }
+.badge__dot { width:.5rem; height:.5rem; border-radius:50%; background:currentColor; }
+
+/* Table (data-dense; numerals right-aligned) */
+.table { width:100%; border-collapse:collapse; font-size:var(--text-sm); }
+.table th, .table td { text-align:left; padding:.625rem .75rem; border-bottom:1px solid var(--border); }
+.table th { color:var(--text-secondary); font-weight:var(--weight-medium); background:var(--bg-subtle); }
+.table td.num, .table th.num { text-align:right; font-variant-numeric:tabular-nums; }
+.table tbody tr:hover { background:var(--bg-subtle); }
+
+/* Modal */
+.modal__backdrop { position:fixed; inset:0; background:rgba(11,22,32,.5); display:grid; place-items:center; padding:var(--space-4); }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-3); max-width:min(92vw,520px); width:100%; padding:var(--space-6); }
+.modal__actions { display:flex; justify-content:flex-end; gap:var(--space-3); margin-top:var(--space-5); }
+
+/* Nav */
+.nav { display:flex; align-items:center; gap:var(--space-5); padding:var(--space-3) var(--space-5);
+  background:var(--surface); border-bottom:1px solid var(--border); }
+.nav a { color:var(--text-secondary); text-decoration:none; font-weight:var(--weight-medium); }
+.nav a:hover, .nav a[aria-current="page"] { color:var(--text); }
+
+/* Layout helpers */
+.container { max-width:var(--container); margin-inline:auto; padding-inline:var(--gutter); }
+.container--narrow { max-width:var(--container-narrow); }
+.grid { display:grid; gap:var(--space-5); }
+.surface { background:var(--surface); }
+.muted { color:var(--text-secondary); }
+
+/* ----------------------------------------------------------------------------
+   9. PRESENTATION / SLIDE TYPE SCALE  (LOCKED, added 2026-06-26)
+   ADDITIVE, SCOPE-GATED. Re-maps the semantic --text-* / --lh-* ramp to a LARGER
+   "across-the-room" scale so existing token-based components scale up automatically
+   INSIDE a deck — and ONLY inside a deck. Nothing here touches the base web/document
+   ramp in §5; the website and Word/printed materials render byte-for-byte as before.
+
+   SCOPE: opt a deck root in with EITHER selector —
+       <body class="novus-slides">  OR  <body data-surface="slide">
+   Both are accepted (comma-separated below). No other surface is affected.
+
+   CANVAS: decks are authored on a 1280×720 design canvas scaled up to fill the
+   projector, so the px below are in that 1280×720 space. One modular ratio (~1.22).
+   Body lands ~24px (floor ~18px), titles ~46px (lh tight), hero ~72px, eyebrows ~17px
+   with the existing uppercase + letterspacing treatment. Body lh stays generous (~1.45);
+   large headings tighten (~1.1). Carlito + the semantic-role-token architecture intact.
+   -------------------------------------------------------------------------- */
+.novus-slides,
+[data-surface="slide"] {
+  /* Re-mapped semantic ramp (px @ base 16 in the 1280×720 canvas) */
+  --text-xs:   1.0625rem; --lh-xs:1.4rem;     /* 17px — captions / fine print (floor ~17px) */
+  --text-sm:   1.1875rem; --lh-sm:1.65rem;    /* 19px — secondary / labels */
+  --text-base: 1.5rem;    --lh-base:2.175rem; /* 24px / lh 1.45 — slide body (never below ~18px) */
+  --text-md:   1.625rem;  --lh-md:2.35rem;    /* 26px — lead body */
+  --text-lg:   1.875rem;  --lh-lg:2.55rem;    /* 30px — sub-heading / large bullets */
+  --text-xl:   2.25rem;   --lh-xl:2.7rem;     /* 36px — h3 / KPI label-pair */
+  --text-2xl:  2.75rem;   --lh-2xl:3.1rem;    /* 44px — h2 / section sub-title */
+  --text-3xl:  3.375rem;  --lh-3xl:3.6rem;    /* 54px — KPI numbers / stat values */
+  --text-4xl:  4rem;      --lh-4xl:4.2rem;    /* 64px — h1 / large slide title */
+  --text-display: 5.25rem; --lh-display:5.4rem; /* 84px — hero / cover title */
+
+  /* Explicit slide heading tokens (use directly where a component isn't ramp-driven) */
+  --slide-hero:    4.5rem;    --lh-slide-hero:4.7rem;    /* 72px — hero / section divider title (lh ~1.05) */
+  --slide-h1:      2.875rem;  --lh-slide-h1:3.15rem;     /* 46px — standard slide title (lh ~1.1) */
+  --slide-h2:      2.25rem;   --lh-slide-h2:2.55rem;     /* 36px — slide sub-title */
+  --slide-body:    1.5rem;    --lh-slide-body:2.175rem;  /* 24px — body copy (lh ~1.45) */
+  --slide-bullet:  1.375rem;  --lh-slide-bullet:1.95rem; /* 22px — bullet list items (lh ~1.42) */
+  --slide-kpi:     3.375rem;  --lh-slide-kpi:3.6rem;     /* 54px — KPI / stat number */
+  --slide-eyebrow: 1.0625rem; --lh-slide-eyebrow:1.4rem; /* 17px — eyebrow / kicker (pair w/ uppercase + --tracking-wide) */
+  --slide-caption: 1.0625rem; --lh-slide-caption:1.4rem; /* 17px — caption / footnote */
+}
+
+/* ----------------------------------------------------------------------------
+   10. SLIDE-DECK LAYOUT  (LOCKED, added 2026-06-29)
+   The HTML-presentation system. Decks author on a fixed 1280×720 canvas (scaled to
+   fill the screen/projector) and carry `.novus-slides` for the larger §9 type scale.
+
+   FOOTER SAFE-AREA (LOCKED — this is what stops text / boxes bleeding over the footer):
+   - Every content slide reserves a bottom FOOTER BAND (the slide's `padding-bottom`).
+     NOTHING in the slide body may enter it.
+   - The slide body is HARD-CLIPPED at the safe line (`overflow:hidden`), so a slide that
+     is slightly over-full clips cleanly ABOVE the footer instead of bleeding over it.
+   - A page/print engine fits content inside the 720px slide WITHOUT spilling a new page,
+     so a PAGE-COUNT check does NOT detect footer overlap — every slide must be VERIFIED
+     VISUALLY (run a second QC pass / sub-agent over the rendered pages).
+   - PAGE NUMBERS are baked into the footer at BUILD time, never set by runtime JS: a
+     static export / PDF (e.g. WeasyPrint) does not run scripts, so JS-set numbers vanish.
+
+   AUTHORING (LOCKED): one idea per slide. Because §9 type is large, SHORTEN the copy or
+   SPLIT a dense slide into two — never shrink type below the scale to force a fit. Keep
+   card / KPI captions and subtitles to ONE line on dense (multi-card) slides.
+
+   PRINT-ENGINE LAYOUT (LOCKED — WeasyPrint & similar static renderers used for PDF export):
+   - CSS Grid / flex items STRETCH to the tallest sibling's row height (`align-items:start`
+     is unreliable), inflating cards with whitespace; NESTED flex inside a flex parent can
+     render BLANK. For height-sensitive blocks use BLOCK flow (margins) or the `.bullets`
+     component, NOT grid/flex — and always verify the exported PDF, not just the browser.
+   - STAT / KPI numbers: set `white-space:nowrap`. A range with an en/em-dash (e.g. "12–13")
+     can spawn a phantom 2nd line in the number box, dropping that stat's caption a line below
+     the row and breaking caption alignment.
+   - CARD TITLES: use plain BLOCK text, never a flex container — a flex heading wraps a short
+     title onto two lines even when it would fit on one.
+
+   SOURCE OF TRUTH vs. SELF-CONTAINED OUTPUT (LOCKED — two stages that coexist, not a conflict):
+     1) DESIGN & BUILD time — tokens.css is the AUTHORITY. Every colour, type token, component
+        and lockup rule in a deck is derived from THIS file; leverage it while building.
+     2) SHIPPED FILE — a self-contained SNAPSHOT of it: read tokens.css at BUILD time, INLINE it,
+        embed Carlito (woff2) and every image as base64, and NEVER `<link>` it at runtime.
+   (Build-time dependency, runtime independence — like compiling source into a standalone binary;
+   rebuild to re-snapshot whenever tokens.css changes.) Runtime linking is forbidden because
+   Safari blocks a file:// page from loading a parent/sibling-dir (`../`) stylesheet → the deck
+   opens as a BLACK SCREEN. Pin the theme with `<html data-theme="light">` so OS dark-mode can't
+   re-tune it.
+
+   Reference implementation: 02_Slide_Decks/Novus_Maldives_Resort_Loyalty_v1.html
+   (built by outputs/build_maldives_deck.py; it uses its own .slide/.s-body/.s-foot for
+   on-screen scaling). The `.nslide*` classes below encode the canonical safe-area pattern
+   for future decks — named so they never clobber a deck's own `.slide`. */
+.nslide{
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  padding:44px 64px 84px;                 /* the bottom 84px is the reserved FOOTER BAND */
+  background:var(--bg); color:var(--text);
+}
+.nslide__body{ flex:1; min-height:0; overflow:hidden; }   /* HARD CLIP above the footer */
+.nslide__foot{
+  position:absolute; left:64px; right:64px; bottom:26px;
+  display:flex; align-items:center; justify-content:space-between; gap:var(--space-4);
+  border-top:1px solid var(--border); padding-top:12px;
+  font-size:var(--slide-caption); color:var(--text-muted);
+}
+
+/* ============================================================================
+   NEVER LIST (load-bearing — do not reintroduce)
+   - No content in the reserved slide FOOTER BAND — the slide body clips at the safe
+     line so text/boxes/images never bleed over the footer (see §10).
+   - No JS-set page numbers on slides — bake them at build time (static export runs no JS).
+   - No decorative gradients; no stacked drop-shadows.
+   - No stock "glowing globe / network mesh" imagery.
+   - No pure #000 on pure #FFF — use --text on --bg.
+   - No more than one accent colour per view.
+   - Emphasis by weight, never italics or ALL-CAPS shouting.
+   - No hard-coded colour/space values in components — tokens only.
+   - No #F4F7FA (neutral-50) as a page/app ground — apps ground on --bg (white).
+   - No inline display on logo <img>s — use .brandlogo--light/--dark so dark→white swaps.
+   - No hardcoded dark text on a token surface — use --*-text tokens so it lightens in dark.
+   - No green as a page or panel ground — green is success/status only.
+   - No punchline/lead-line that wraps to a 2nd line orphaning 1–3 words — cap ~58 chars (§11).
+   - No annotation badge centred on UI text/price/button — subtle, in the margin (§11).
+   - No baked-in PNG footer with its own geometry — reuse the deck safe-area (§11).
+   - No raster pastes of a source deck's diagrams/charts in a migration — redraw natively (§11.E).
+   - No footer text/nav directly on a photograph — full-bleed slides carry a bottom scrim (§11.F).
+   - No recolouring/inverting/filtering a client or partner mark — original colours only (§11.G).
+   - No client mark placed with a baked-in solid plate/background — trim to a clean white/
+     transparent ground first; prefer the official positive-on-white asset (§11.G plate hygiene).
+   - No exotic Unicode symbol glyphs (☁ ⎈ ◆ weather/tech dingbats) in a deck/doc — Carlito has
+     no glyph and renders tofu; use an inline SVG (HTML/print) or a native shape (PPTX) (§11.H).
+   - No ALL-CAPS product/platform name in a deck ("novaSTORE") — use the LOCKUP asset in a logo
+     slot / standalone / sentence-leading, a lowercase two-tone wordmark mid-sentence, or lowercase
+     text in captions, bands and on dark grounds (§D2). Product names are ALWAYS lowercase.
+   - No centre-aligned Closing or Section Divider, and no big centred body logo on them — both are
+     LEFT-aligned + VERTICALLY centred with the standard FOOTER white logo (§D0).
+   - No ad-hoc hex on an AUTHORED dark slide (divider/closing) — dark text derives from the blue
+     ramp (kicker/muted --blue-300, secondary --blue-100, primary --text-on-accent, sep --blue-400).
+   - No real third-party (non-client) figure, name or logo that is NOT in the source deck — even
+     "illustrative"; illustrative examples stay generic/unbranded (§11.I).
+   - No invented section colours — only the locked §D0 sequence, taken contiguously.
+   ========================================================================== */
+
+/* ============================================================================
+   11. LAST-MILE POLISH — AUTHOR-TIME GUARDRAILS + QC RUBRIC  (LOCKED, 2026-06-29)
+   Why this exists: footer-bleed QC passed, yet trivial UX defects still shipped —
+   orphaned punchline words, number badges covering app UI, a legend clipped by a
+   BAKED-IN footer. They escaped because (a) the QC rubric only checked bounds/footer,
+   not typography or occlusion; (b) composed PNGs (device mockups, charts) bypass the
+   CSS safe-area, so the locked deck rules never protected them; (c) review was done on
+   full-page thumbnails where 1-word orphans and small badges are invisible.
+   PRINCIPLE: prevent at author time (make the bad state unrepresentable) > detect later.
+
+   A. TYPOGRAPHY GUARDRAILS (prevent the defect)
+   - Punchline / lead-line budget: a closing or highlighted line must fit ONE line at the
+     bold slide-body size. Hard cap ~58 chars. If longer, cut it — never let it wrap to a
+     2nd line that orphans 1–3 words ("…flywheel.", "…resort group."). Use text-wrap:balance
+     where supported, but the CHAR CAP is the reliable rule (WeasyPrint ignores balance).
+   - Card titles: plain BLOCK, never flex (flex h4 wraps short titles). Numbers/stats:
+     white-space:nowrap (an en-dash range spawns a phantom 2nd line).
+   - KPI rows: abbreviate long figures (1M+, 120M+) so no column overflows into its
+     neighbour; equal flex columns, captions on one line.
+   - Multi-row LISTS (agenda, step lists) — LOCKED, 2026-07-14 (from the corp-master agenda,
+     which clipped row 6 into the footer): do NOT rely on inherited token type + the slide's
+     loose line-height under justify-content:center. Rows silently inflate (e.g. --slide-bullet
+     22px + inherited lh 1.38 ≈ 75px/row) and clip against the footer while qc_check's footer
+     band check can still pass. Set EXPLICIT compact px sizing (title/sub font-size + line-height
+     + row gap) and VERIFY the LAST row clears the footer band in the render.
+
+   B. ANNOTATION / CALLOUT GUARDRAILS (default component, not per-slide invention)
+   - Markers on a screenshot/mockup are SUBTLE by default: ~20px, translucent-white fill,
+     coloured ring + coloured numeral. Place in the MARGIN/whitespace beside the feature —
+     NEVER centred on text, prices, totals or buttons. The UI underneath must stay legible.
+
+   C. COMPOSED-IMAGE RULE (the path that bypassed the locked rules)
+   - Any baked PNG dropped into a slide (device showcase, chart, diagram) MUST reuse the
+     SAME footer safe-area + type scale as the deck. Do not bake a separate footer with its
+     own ad-hoc geometry. Verify its internal content clears the footer band like any slide.
+
+   D. VERIFICATION PROTOCOL (catch what prevention misses)
+   - AUTOMATED GATE: `slide-template/build/qc_check.py` renders the slide HTML through WeasyPrint and
+     inspects the real layout box tree; the build scripts call it and FAIL LOUDLY (non-zero
+     exit) on any defect, so a bad layout never ships on a tired visual pass. Checks:
+       C1 .lead-line punchline must be ONE line   C2 nothing crosses into the footer band
+       C3 rendered pages == .slide sections       C4 .s-title wrap > 2 lines (warn)
+       C5 a KPI number wider than its cell/row    C6 .lead-line / .callout orphan tail (<40%)
+     Run on the composed-image SOURCE too (the app preview), and `--self-test` proves the
+     checks still fire. A check only guards the elements you SCOPE it to — the novaai callout
+     slipped C1 because it was `.lead`, not `.lead-line`; that is why C6 covers `.callout`
+     and any new statement element must carry a class the checker watches.
+   - Still review at 2× and ZOOM for the things code can't see (badge occlusion over a baked
+     screenshot, colour, meaning) — full-page thumbnails hide these. Don't sign off from them.
+
+   E. MIGRATED / SOURCE-DECK CONTENT (LOCKED, 2026-07-09 — from the BOB migration audit) —
+      when migrating a deck, DIAGRAMS, CHARTS and TABLES from the source are ALWAYS
+      natively redrawn on-brand (tokens, Carlito, component patterns) — or explicitly
+      approved as-is by the owner PER ELEMENT; never silently pasted as raster renders of
+      the old design (rasters carry the old template's colours/fonts and defeat the
+      migration). PHOTOGRAPHIC imagery (3D renders, mood boards, photos) may ship as
+      full-bleed figures under rule C.
+   F. FULL-BLEED FOOTER LEGIBILITY (LOCKED, 2026-07-09) — on image-bleed slides the footer
+      band (nav bar + caption + logo) sits on a bottom SCRIM (dark gradient mirroring the
+      top caption scrim) so it stays legible on any photo; use the WHITE logo on the scrim.
+      Never place footer text or nav segments directly on a photograph.
+   G. CLIENT MARKS NEVER RECOLOURED (LOCKED, 2026-07-09) — a client/partner mark is never
+      recoloured, inverted or CSS-filtered. On dark grounds place it in its original
+      colours on a white holder tile, or use the client's official reverse asset.
+      PLATE HYGIENE (LOCKED, 2026-07-14 — from the corp-master migration, where BancNet & SDB
+      shipped with baked BLACK plates that "on a white tile" did not remove): a source logo CROP
+      may carry a baked-in solid background plate. Before use, TRIM the mark to a clean white/
+      transparent ground — prefer the client's official POSITIVE-on-white asset, keep the source
+      in _orig_clients/ — scale to equal optical weight (§11.G walls), and VERIFY on the white
+      tile (a corner-pixel white check is NOT enough; inspect the render).
+   H. GLYPH COVERAGE (LOCKED, 2026-07-14 — from the corp-master Azure slide, where ☁ U+2601 and
+      ⎈ U+2388 rendered as tofu boxes) — Carlito (and its Calibri twin) cover Latin + common
+      punctuation only; exotic Unicode symbols (weather / tech / misc dingbats) have NO glyph and
+      render as a missing-glyph box in HTML, WeasyPrint AND PowerPoint. NEVER type such a symbol
+      into a deck/doc. Draw the icon as an INLINE SVG (HTML + print) or a NATIVE SHAPE (PPTX —
+      e.g. MSO_SHAPE.HEXAGON) coloured via currentColor/theme. Safe set = the glyphs Carlito
+      ships (‹ › · — “ ” ‘ ’ • are fine). Verify any non-ASCII mark in the RENDER, not the source.
+   I. SOURCE FIDELITY & DATA PROVENANCE (LOCKED, 2026-07-14 — from the Retail-Loyalty migration,
+      where an agent inserted a real integrated-resort operator's FY financials, incl. GAMING
+      revenue, as an "illustrative" example) — when migrating or generating any deck/doc: carry
+      every figure VERBATIM from the source and keep its "indicative / target / projection"
+      qualifiers. NEVER introduce a real THIRD-PARTY (non-client) company's financials, name or
+      logo that is not in the source — even labelled "illustrative" it implies a false relationship
+      and is off-brand; illustrative examples are GENERIC/unbranded. Verify every NON-source figure
+      against the source before shipping. (Reinforces §11.G client marks, clients-vs-prospects, and
+      never-leak-internal-notes.)
+   J. RENDER-TRAP CARRY-OVER (LOCKED, 2026-07-14) — a vertical label via `writing-mode:vertical-rl`
+      must NOT also `transform:rotate(180deg)` (renders UPSIDE-DOWN in WeasyPrint); use the
+      writing-mode alone, or a native shape/label. (Adds to the engine-trap list in the deck
+      migration handover.)
+   ========================================================================== */
+
+/* ============================================================================
+   CANONICAL SLIDE TEMPLATE — SINGLE SOURCE (LOCKED, 2026-06-29)
+   There is ONE Novus slide template, for BOTH PowerPoint and HTML, and it lives in
+   `00_Design_System/slide-template/`:
+       pptx/   Novus_Template.potx (+ _base.pptx, Starter deck, README)  — PowerPoint
+       html/   novus-slide-template.html (+ README)                       — HTML slides
+       build/  novus_pptx_theme.py, build_pptx_template.py, build_agenda_deck.py,
+               gen_pictograms.py, qc_check.py                             — generators
+   tokens.css (§9–§12) is the design anchor both renderers derive from. The earlier
+   `00_Design_System/presentation/` template is DEPRECATED and quarantined in
+   `00_Design_System/_archive/` — do not use it. (Reference decks, e.g. the Maldives
+   deck in 02_Slide_Decks, are built FROM this system, not part of the template.)
+   SCAFFOLD LOCKSTEP (LOCKED, 2026-07-09 — from the BOB migration audit, where a stale
+   scaffold induced locked-rule violations): html/novus-slide-template.html is a DERIVED
+   artifact of §9–§D3 and MUST be resynced in the SAME change as any amendment to those
+   sections — the same lockstep discipline as brand.html. HTML decks are built/migrated
+   per slide-template/How_to_build_a_Novus_HTML_deck.md (author on the scaffold → ship
+   self-contained per §10 → `qc_check.py --conformance` + 2× visual pass before delivery).
+   DECK STRUCTURE (LOCKED, 2026-07-14): per-section body DIVIDER slides are OPTIONAL. A deck may
+   run a FLAT agenda-driven flow — Title → Agenda → content slides (each carrying its section
+   colour on the eyebrow + the nav-bar tracker) → Closing — with NO divider between sections (the
+   corp master, Combined Ver 1.3, does this); or it may use full dark section dividers (BOB,
+   Talent). Both are on-system; the nav-bar per-section tracker is what carries section
+   wayfinding, so the locked §D0 colour sequence applies either way.
+
+   12. POWERPOINT THEME  (LOCKED, 2026-06-29)  — tokens.css is the design anchor.
+   `slide-template/build/novus_pptx_theme.py` PARSES THIS FILE LIVE (reads the --*-NNN hexes; no
+   hard-coded brand colours) and emits the Office theme; the reusable template is
+   `00_Design_System/slide-template/pptx/Novus_Template.potx`; reference decks are built
+   editable by `outputs/build_pptx.py`. (Same two-stage model as §10 — rebuild to re-snapshot.)
+
+   A. COLOUR SCHEME — token -> Office 12-slot (theme1.xml <a:clrScheme>):
+       dk1  = blue-900  #0E2336  (body text / dark ground)
+       lt1  = #FFFFFF
+       dk2  = blue-700  #00457A
+       lt2  = neutral-50 #F4F7FA
+       accent1 = blue-500  #0070C0  (Novus Blue / novapay)
+       accent2 = amber-400 #E8A300  (novastore / retail)
+       accent3 = green-500 #00A04A  (signal green / success / novabank)
+       accent4 = blue-700  #00457A  (deep blue / platform, novatrust)
+       accent5 = indigo-500 #534AB7 (novaai)
+       accent6 = neutral-600 #51606F (secondary text)
+       hlink = #0070C0   folHlink = #00457A
+     Supporting (used directly, not slots): border neutral-200 #DCE3EB, tint
+     neutral-50 #F4F7FA, muted neutral-500 #6B7886, highlight-text #00457A.
+
+   B. FONTS — major + minor = Carlito (the Novus typeface, §Typography). Office
+     users must have Carlito installed (free, metric-compatible with Calibri) so
+     PowerPoint matches the web/PDF exactly.
+
+   C. CANVAS / GEOMETRY — 16:9 at 13.333in x 7.5in (== the 1280x720 HTML at
+     px/96). Side margin 0.667in (= 64px). Footer band bottom ~0.6in with a 0.75pt
+     hairline; page numbers baked "N / total". Mirrors §9/§10.
+
+   D0. TEMPLATE SLIDE LAYOUTS (.potx, hand-authored OOXML by build_pptx_template.py) —
+     the master carries real PowerPoint LAYOUTS so anyone can "New Slide → pick a
+     layout → type"; background, logo, footer, nav bar and page number are baked as
+     STATIC shapes (not placeholders) — only content placeholders are editable.
+     TWO BRAND PALETTES SHIP AS REAL, COPYABLE SLIDES (not layouts) in the .potx — so
+     employees copy logos straight off them in Normal view, NO Slide-Master needed
+     (delete before sending). They sit on the Blank layout:
+       SLIDE Brand Lockups      labelled grid of the 8 product/platform lockups + master logo
+       SLIDE Brand Logos        master lockup + sub-brand wordmark in all 6 treatments
+                                (colour/blue/green/grey/black + white on dark tiles)
+     LAYOUTS (17, LOCKED order) — Title → Section Divider → Agenda → content types →
+     Closing → Blank:
+       Title (dark)             full-bleed branded background (WHITE logo + orbit/markets/
+                                flags, adopted from the corp deck) + editable headline
+                                placeholder over it (bg = logos/title_bg_white.png)
+       Section Divider (dark)   section label + big title; white logo
+       Agenda (light)           eyebrow + title + 5 colour-numbered section rows
+       — per section (×5), the USER PICKS the content style: —
+       Content · N  (LIST)      eyebrow(section colour) + title + intro + bulleted body
+       Cards · N    (BOXES)     eyebrow + title + intro + 3 rounded cards (title+body)
+                                  …both light the section's segment in the footer nav bar
+       Content — KPI / Stats    eyebrow + title + intro + 4 big number/label callouts (section-aware)
+       Content — Two Column     eyebrow + title + intro + L/R bodies (section-aware)
+       Closing (dark)           LEFT-aligned + VERTICALLY centred (s-body justify-content:center,
+                                NO text-align/align-items — same frame as the Section Divider):
+                                kicker (sector line) + big title ("Thank you"/closing line) + CTA +
+                                contact block (website · email · phone + HQ address, from
+                                Novus_Context) — ALL left. The "white logo" is the standard FOOTER
+                                white logo — NOT a separate centred body logo. Authored-dark-slide
+                                text derives from the blue ramp (NEVER ad-hoc hex): kicker/muted
+                                --blue-300, secondary/CTA --blue-100, primary/contact
+                                --text-on-accent, separators --blue-400. (Clarified 2026-07-14 —
+                                "ctr" = vertically centred, not centre-aligned.)
+       Blank (light)            empty white canvas (also hosts the 2 brand slides)
+     CONTENT STYLE IS A CHOICE (LOCKED): every content idea can be a LIST (bullets) or
+     BOXES/HIGHLIGHTS (Cards = the HTML deck's white rounded .tile; or the KPI stat band).
+     Cards/lists are per-section (tracked). KPI + Two-Column are SECTION-AWARE too (LOCKED,
+     updated 2026-07-07 — was "section-neutral"): EVERY content-type slide (list, cards, KPI,
+     two-column) inherits its section colour on the eyebrow, the eyebrow DOT and the footer
+     nav-bar segment, so the PPTX and HTML renderers agree and no in-section slide drops the tracker.
+     SECTION COLOUR SEQUENCE (LOCKED, updated 2026-07-09 — VARIABLE section count): a deck
+     has as many sections as its story needs (4, 5, 6 or 7 — SEVEN is the ceiling; more →
+     restructure). Colours are taken CONTIGUOUSLY from this ordered sequence, one per
+     section, never reordered or invented:
+       1 blue-500 #0070C0 · 2 amber-400 #E8A300 · 3 green-500 #00A04A ·
+       4 indigo-500 #534AB7 · 5 blue-700 #00457A · 6 orange-400 #E87830 (logo-ink orange) ·
+       7 slate neutral-600 #51606F
+     (The hand-maintained Novus_Template.potx currently ships 5 content sections; a 6- or
+     7-section PPTX is a deliberate manual extension of the .potx by the owner — never
+     regenerate it.) The Agenda sets the colour↔section legend; every Content layout repeats
+     it as a footer NAV BAR (pill segments). NAV SCHEME (LOCKED, updated 2026-07-07):
+     ONE segment PER SECTION (the segment count follows the deck's section count — NOT a
+     fixed 5). Each carries its OWN section colour — FADED for the inactive segments (faded
+     tints = 30% of the accent on white: blue #B2D4EC · amber #F8E3B2 · green #B2E2C9 ·
+     indigo #CBC9E9 · blue-700 #B2C7D7 · orange #F8D7C1 · slate #CBCFD4).
+     DARK-GROUND FADE (LOCKED, 2026-07-09 — from the BOB v2 title-slide review): the
+     white-mix tints above are for LIGHT grounds only; on a dark or photo ground
+     (full-bleed scrims, any dark CONTENT ground) an inactive segment is the SAME BRIGHT
+     accent at ~32% alpha (rgba over the dark ground), so the bar reads as a deliberate
+     muted colour strip, never washed-out pastel. Keep the bar clear of any artwork baked
+     into the background.
+     Active = FULL-colour + THICKER (a taller pill) for the ACTIVE section —
+     a clear "you are here" tracker, identical in PPTX and HTML (HTML inactive ~10px /
+     active ~18px; PPTX active pill 109728 EMU tall vs 64008 inactive).
+     NAV BAR = CONTENT SLIDES ONLY (LOCKED, updated 2026-07-09 — owner decision,
+     SUPERSEDES the 2026-07-07 shaded-bar-on-non-content rule): the tracker appears on
+     every in-section CONTENT slide (full-bleed content slides included — on the §11.F
+     scrim, dark-ground fade); Title, Agenda, Section Dividers, Closing and appendix
+     slides carry NO nav bar — just the footer line. ONE SCHEME (LOCKED):
+     the eyebrow text, its leading DOT and the ACTIVE nav segment ALL use the SAME BRIGHT
+     section accent above (e.g. green-500 #00A04A for Platform) — NEVER the darker -700
+     text step — so title and navigation match in BOTH formats.
+     FOOTER = nav bar on top (content slides), then colour logo bottom-LEFT (on dark
+     Divider/Closing the WHITE logo, also bottom-left — ONE logo system across formats)
+     + centred "CONFIDENTIAL · <footer_topic> · <year>" (per-deck footer_topic parameter;
+     the old "INSERT TOPIC" placeholder is retired) + auto slide-number field beneath.
+     TITLE LAYOUT (LOCKED, updated 2026-07-09 — owner decision): the canonical title
+     design IS THE WEBSITE HERO — dark ground, WHITE master lockup top-left, headline +
+     kicker left, and the hero-map globe right (the 7 Novus markets with payment flows
+     converging on Singapore·HQ; source of truth: site/pages/home.html hero-map SVG +
+     the .hero-map rules in site/assets/site.css). HTML decks EMBED the live hero at
+     build time (animated flows/pulses; reduced-motion-safe; freezes static in PDF
+     exports). PPTX shows the SAME design as a STATIC bake. The earlier corp-plate
+     asset title_bg_white.png (--asset-title-bg) is SUPERSEDED as the title background —
+     re-bake the PPTX title image from the hero. NO nav bar on the title.
+     Dark layouts ground on dk1 (#0E2336), white logo, blue-300 eyebrow; light layouts
+     white + colour logo. Body bullets '›'. To change section count/colours edit
+     SECTIONS in build_pptx_template.py (Content layouts regenerate per section).
+
+   D1. AGENDA-DRIVEN GENERATION + COPILOT (slide-template/build/build_agenda_deck.py, README.md) —
+     edit the DECK agenda (up to 7 sections + their slides, per the §D0 sequence) and it builds the whole deck on
+     these layouts: Title → Agenda (from section names) → per section a Divider +
+     Content·N slides with the footer nav bar auto-set to that section's colour →
+     Closing. Output is a standard .pptx that M365 Copilot / Copilot Cowork can rewrite
+     in place — Cowork preserves the named layouts/theme/logo/geometry and only swaps
+     text, so the colour tracker survives. Ship `Novus_Starter_Deck.pptx` (empty,
+     pre-laid-out) as the Copilot starting point; publish `Novus_Template.potx` to the
+     SharePoint org assets library so Copilot offers it as the org template. NOTE:
+     Copilot building from scratch applies the theme but won't auto-assign the
+     per-section tracker — use the starter deck (B1) or the generator for exact trackers.
+
+   D. LAYOUT LIBRARY (the reusable code "layouts", in build_pptx.py — for fully
+     programmatic decks like the Maldives deck) — cover (dark),
+     content-cards (1-3-4-6 up), kpi/proof, flow (numbered steps + chevrons),
+     quote, image+legend, full-bleed image, closing (dark). Cards = rounded
+     rectangles, white fill, 0.75pt #DCE3EB border, NO shadow, NO accent stripes.
+     Product lockups (LOCKED): pictograph + all-lowercase two-tone name — 'nova' =
+     blue-400, suffix AND pictograph = the product's --accent-text (novapay blue-700,
+     novastore amber-700, novaai indigo-600; NOT the bright 400/500 accent). PowerPoint
+     can't render the currentColor SVGs, so use the pre-tinted PNG pictographs in
+     logos/icons/png (tokens --logo-*-png, generated by slide-template/build/gen_pictograms.py).
+     All card paragraphs LEFT-aligned (autoshapes default to centred — set
+     PP_ALIGN.LEFT explicitly or titles/lockups drift centre).
+
+   D2. VERTICAL / SUB-BRAND LOCKUP — RULE FOR ANY BUILD (LOCKED). Every mention of a
+     product vertical (novapay · novabank · novastore · novatrust) or platform sub-brand
+     (novahub · novaware · novaserve · novaai) MUST inherit its tokens.css branding —
+     all-lowercase, 'nova' = blue-400, suffix = that product's --accent-text — and its
+     ICONOGRAPHY (the pictograph) wherever the lockup stands alone — a card title, a logo
+     slot, a product-LED slide title, or the platform ARCHITECTURE block (§D3). The mark
+     sits TIGHT to the wordmark at the same cap-height (the PNGs carry ~12% side padding,
+     so use a tight offset, never a full icon-width gap). INLINE mentions in running text
+     (a title/bullet sentence, an intro) stay two-tone WORDMARK ONLY — PowerPoint cannot
+     inline an icon inside a text run.
+     NEVER render a vertical/sub-brand as plain typed text. Enforcement: the deck
+     generator (build_agenda_deck.py `set_branded_text`) auto-detects these names in ANY
+     placeholder and renders the two-tone lockup (+ pictograph from logos/icons/png when
+     the whole field is the lockup). The same applies to the HTML renderer (`vlogo`/`wlogo`
+     in build_maldives_deck.py) and to any future build — programmatic or hand-authored.
+     (When typing manually in PowerPoint/Copilot, apply the lockup yourself — PowerPoint
+     will not auto-format it. AID: open `slide-template/pptx/Novus_Brand_Lockups.pptx` —
+     a VISIBLE labelled grid of the 8 ready-made lockups (icon + two-tone wordmark, tokens
+     `--logo-lockup-*`, built by gen_lockups.py); copy one onto your slide. It's a helper
+     slide — delete it before sending the deck.)
+
+   D3. PLATFORM ARCHITECTURE BLOCK (LOCKED, 2026-07-07) — the canonical way to present the
+     platform building blocks (mirrors the website "Modular components" section); NOT a
+     bullet list. Three modular-component lockups — novahub · novaware · novaserve (default
+     deep-blue accent) — as equal cards/tiles (pictograph + two-tone name + one-line tag),
+     with novaai (indigo, theme-novaai) as a full-width BAND SPANNING all three beneath
+     them, carrying its lockup + "AI Intelligence Core · Data Flywheel" and THREE pips on
+     its top edge. HTML: the pips pulse (novapulse2, staggered .5s; reduced-motion-safe).
+     PPTX: the SAME layout static — three tiles + the indigo band + three static dots.
+     Source of the design is the website (site/pages/home.html architecture_cards());
+     decks mirror it.
+
+   E. NEVER (PPTX) — no Aptos/Calibri-default (use Carlito); no accent stripes or
+     header/footer colour bars; no centred body; no decorative gradients; theme
+     colours/fonts come from this mapping, never hand-picked per deck.
+   ========================================================================== */
+
+/* ----------------------------------------------------------------------------
+   13. DOCUMENT / PROPOSAL LAYOUT  (LOCKED, added 2026-07-07)
+   The RESTRAINED layout spec for Word/PDF deliverables — proposals, reports,
+   memos, evaluations. §12's colour map says WHICH token goes where; this section
+   says HOW MUCH and in WHAT HIERARCHY, so a rule-following build reads calm, not
+   blue-heavy. Anchor: "mastery without drama" — emphasis by weight + hairlines,
+   NOT by solid fills. Scope a document root with class="novus-doc". Sizes are in
+   pt (Word's unit); they mirror the §5 ramp intent for print.
+
+   A. DOCUMENT TYPE RAMP (pt) — one restrained hierarchy, driven by WEIGHT + colour,
+      never by size inflation:
+        --doc-cover-title:    26pt  bold   --blue-700
+        --doc-cover-subtitle: 14pt  regular --neutral-600   (always > footer size)
+        --doc-eyebrow:         9pt  bold   --blue-500  UPPERCASE + --tracking-wide
+        --doc-h1  (e.g. "1.0 …"): 16pt bold --blue-700 (SINGLE tone — the number AND the
+                                  words are the SAME --blue-700; never mix two blues in one
+                                  heading), with a single 1pt --blue-700 hairline beneath;
+                                  ~18pt space-before
+        --doc-h2  (e.g. "1.1 …"): 12pt bold --blue-700 (single tone)
+        --doc-h3  (phase/label):  11pt bold --blue-700 (single tone)
+        --doc-body:            10.5pt regular --neutral-900, line-height ~1.4
+        --doc-caption:          8pt  regular --neutral-500   (= footer + page number)
+        --doc-table-cell:      9.5pt regular --neutral-900
+
+   B. TABLE STYLING — TINTED, not solid (this is the anti-blue-wall rule).
+      For ANY document with more than one table, the §12 "table header fill
+      --blue-500" default is REPLACED by a tinted header:
+        - Header row FILL: --blue-50 (or --neutral-50 for a quieter table);
+          header TEXT: --blue-700, bold. NO solid --blue-500 fill.
+        - A single 1pt --blue-500 hairline along the TOP edge of the header row
+          (the only saturated blue the table gets).
+        - Body cell separators: 0.5–0.75pt --neutral-200 horizontal hairlines only;
+          avoid full boxed gridlines and heavy vertical rules.
+        - Zebra: OPTIONAL and VERY LIGHT — --neutral-50 only, NEVER --blue-50, and
+          default OFF on text-heavy tables.
+        - Numerals right-aligned, tabular (font-variant-numeric:tabular-nums).
+        - Row-LABEL (first) column: --neutral-900 bold — NOT blue. Blue is for the
+          header row only; body cells are --neutral-900.
+        - NEVER split a table across a page break: keep its rows together and move the
+          WHOLE table to the next page if it does not fit (Word cantSplit + keep-with-next).
+      A solid --blue-500 header fill is allowed on AT MOST ONE hero/summary table
+      in a document — never as the repeated default.
+
+   C. RESTRAINT RULE / BLUE BUDGET (LOCKED) — blue appears ONLY as: section
+      headings, header/section hairlines, small emphasis, and links. NEVER as large
+      solid fills repeated down a multi-table document. At most ONE solid-blue block
+      per page-view (e.g. a single key callout); prefer a TINTED callout — --blue-50
+      fill + --blue-700 text + a 3pt --blue-500 left rule — over a solid blue bar.
+      One accent (blue); status colours (--red-600/--amber-700/--green-700) for
+      severity only. Rule of thumb: saturated brand-blue fills ≤ ~10% of any page's ink.
+      Body copy AND table row-labels are --neutral-900 (black) — blue is NEVER used for
+      running text or row labels, only for headings, table headers and small highlights.
+
+   D. FOOTER / PAGE NUMBER — --doc-caption (8pt --neutral-500), and NEVER larger than
+      body. Page number is not emphasised beyond a bold numeral. The footer must read
+      as subordinate to the cover subtitle and to body text.
+
+   E. COVER LAYOUT (proposal) — master COLOUR logo (logos/, size parity) top-left;
+      eyebrow (--doc-eyebrow, e.g. "PROPOSAL"); title --doc-cover-title (--blue-700);
+      subtitle --doc-cover-subtitle (--neutral-600); issuing entity + date --neutral-600;
+      a hairline (--neutral-200) above the copyright/caption block. CLIENT LOGOS are
+      ALLOWED on a proposal cover per the partner-branding rule — a "Prepared for"
+      lockup of the client/partner marks in original FULL COLOUR on white, at size
+      parity beneath the title block or the hairline. Client marks are proof, not
+      decoration; keep them full-colour, unboxed, evenly sized.
+
+   G. EMPHASIS — NO ITALICS, EVER. Emphasise with WEIGHT (bold), a boxed note, or a
+      LIFTED INFO-CARD (H) — never italics. Carlito ships only Regular + Bold, so an
+      italic run silently substitutes to a different face; italics also read as drama,
+      off the "mastery without drama" anchor. ALL-CAPS is for eyebrows only.
+
+   H. LIFTED INFO-CARD + FRAMED FIGURES.
+      - INFO-CARD (for the asides/notes that were tempting to italicise): --neutral-50
+        (or --blue-50) fill + a --neutral-300 hairline border + a 3pt --blue-500 left
+        rule + a bold --blue-700 lead word; body --neutral-900.
+      - FIGURES ARE FRAMED, LOGOS ARE NOT: any embedded FIGURE / mockup / screenshot /
+        brand-board plate gets a visible --neutral-300 hairline frame ("lift" it) and is
+        centred with balanced margins so it never reads as truncated. LOGO lockups
+        (master logo; client "Prepared for" marks) are placed UNBOXED — never framed.
+      - IMAGES NEVER STRETCH (LOCKED, 2026-07-07): a logo/image inside a flex or grid
+        container must carry an EXPLICIT width (or align-self:flex-start) + object-fit:contain
+        so the layout can't distort it — the recurring cause of stretched title/closing/divider
+        logos. Never rely on height:auto+width:auto alone inside a stretch container.
+
+   I. KPI / STAT-CARD BAND over a lone number. A single big figure in a wide box reads
+      oddly; present money + proof as a CARD BAND — one fee card (tinted --blue-50) plus
+      neutral bordered cards for the key highlights (experts, years, phases, sets,
+      systems, mandays if applicable). Numbers --blue-700 bold; labels --neutral-600.
+
+   J. KEEP-WITH-NEXT. A heading or mini-label (e.g. "Engagement at a glance") must never
+      be orphaned at a page foot from the block it introduces — bind it to its content
+      (Word keep-with-next); the same protects every section heading and card/table title.
+
+   K. CARLITO-NATIVE FOUNDATION (LOCKED). Set the document's THEME (major+minor font)
+      AND docDefaults to Carlito — not only per-run overrides — so newly typed or
+      style-only text is Carlito too. Embed the Carlito TTFs (§12). macOS CAVEAT: Word
+      for Mac does NOT reliably use fonts embedded in a file, so the RECIPIENT must
+      INSTALL Carlito (ship the TTFs + a prominent install step). Embedding alone is not
+      sufficient on macOS; installation is the guarantee.
+
+   L. SAMPLE BRAND BOARD — CONVENTION FOR DESIGN / IDENTITY PROPOSALS (LOCKED, 2026-07-07).
+      A brand-identity or design proposal MAY carry a "Sample Brand Board" APPENDIX — an
+      illustrative concept showing logo direction, colour, type and the identity in
+      context (portal, app, dashboard, print collateral, merchandise/environmental). It
+      is drawn from the CLIENT's proposed palette (NOT the Novus palette) and is ALWAYS
+      marked "Illustrative concept — not final artwork", with a disclaimer that nothing
+      reproduces a registered mark and everything is subject to trademark clearance,
+      stakeholder review and client sign-off. Plates are FRAMED figures (H), one per
+      page, centred; the type INSIDE the board is the proposed client face (may be
+      non-Carlito), while the surrounding DOCUMENT stays Carlito (K).
+
+   F. PROFESSIONAL-RESTRAINT CHECKLIST (verify on the rendered PDF before delivery):
+        [ ] Single-tone headings — one --blue-700, never two blues (A).
+        [ ] No solid-blue table headers repeated down the doc — tinted headers (B).
+        [ ] Body + table row-labels black --neutral-900; blue only for heads/highlights (B/C).
+        [ ] ≤ one solid-blue block per page; callouts are tinted (C).
+        [ ] Zebra is off or --neutral-50 only, never --blue-50 (B).
+        [ ] No table split across a page; headings kept with their block (B/J).
+        [ ] No italics — emphasis by weight / box / info-card (G/H).
+        [ ] Figures framed & centred; logos unboxed (H).
+        [ ] KPI card band instead of a lone big-number box where relevant (I).
+        [ ] Footer/page number 8pt --neutral-500, smaller than subtitle & body (D).
+        [ ] Cover carries client/partner logos, full colour on white, unboxed (E/H).
+        [ ] Document theme + docDefaults = Carlito; recipient told to INSTALL Carlito (K).
+        [ ] Any sample brand board marked "illustrative — not final artwork" (L).
+        [ ] Carlito TTFs embedded; logos placed from assets; › hanging bullets (§12).
+   -------------------------------------------------------------------------- */
+.novus-doc{
+  --doc-cover-title:26pt;   --doc-cover-subtitle:14pt; --doc-eyebrow:9pt;
+  --doc-h1:16pt; --doc-h2:12pt; --doc-h3:11pt;
+  --doc-body:10.5pt; --doc-table-cell:9.5pt; --doc-caption:8pt;
+}
+
+/* ----------------------------------------------------------------------------
+   14. POSTER SET & FRAMING  (LOCKED, added 2026-07-14)
+   Source→generated kit: 00_Design_System/posters/ — build_posters.py → out/
+   (poster_<name>_A1 .svg + _200dpi.png + .pdf). Drop-in photography in posters/
+   photos/ (see photos/README.md); framing in posters/FRAMING_GUIDELINES.md.
+   NEVER hand-edit out/ — rebuild from build_posters.py. Values here mirror the build.
+
+   THE SET (9): the platform poster + 8 product posters — 4 solution VERTICALS
+   (novabank · novapay · novastore · novatrust) and 4 modular PLATFORM ASSETS
+   (novahub · novaware · novaserve · novaai). The platform poster shows the four
+   verticals sitting ON a foundation panel of the four reusable platform assets
+   ("Four verticals on a reusable platform."). Never call the set "seven building
+   blocks"; never use the word "core" in poster copy (say "platform").
+
+   FORMAT: A1 portrait 594×841 mm, 200 dpi (4677×6622 px). Ships SVG (Carlito
+   EMBEDDED, self-contained), 200 dpi PNG, and a true-A1 print PDF. All styling
+   derives from these tokens; the master lockup is the PLACED asset from logos/.
+
+   LAYOUT (all posters): master lockup top-left + hairline; LEFT-CENTERED content
+   column (margin 43 mm) — sector eyebrow, ONE-logo lockup (icon-left, tight,
+   two-tone: 'nova' blue-400 + suffix product accent), punchy headline, one support
+   line, "What <product> includes" capabilities, "Who it's for" market-segment
+   chips, product brand line, essence footer. Brand slogan "Scalable · Modular ·
+   Secure" runs on the platform poster (accent, letterspaced).
+
+   PHOTOGRAPHY: the right-hand zone (~49% width) holds an image that FADES into the
+   page on the top, left and bottom (eased gradients — never a hard edge); the bottom
+   fades toward the blue bar. Images are predominantly-Asian / mixed, candid,
+   natural-light, subject sitting slightly right of centre; NO third-party or client
+   branding; any watermark or hallucinated text is removed before use.
+
+   BLUE BASELINE BAR (LOCKED): a full-bleed --blue-500 bar, 8.3 mm at A1, hard against
+   the bottom edge — part of the poster, ALWAYS fully visible, never cropped or
+   covered by a frame rebate; never add a second rule below it.
+
+   FRAMING / NEGATIVE SPACE: reveal the whole poster (blue bar included) inside a
+   UNIFORM white mount border = ~8.5% of the print's SHORT edge (uniform 4 sides,
+   min 20 mm), so the frame rebate lands on the mount, not the artwork. The border
+   scales with the frame so A1/A2/A3 read uniform: A1→50 mm, A2→36 mm, A3→25 mm
+   (frame opening ≥ art + 2×border). Alternatively face-mount / snap-frame with a
+   zero rebate to the trimmed sheet. FRAME PROFILE (LOCKED): slim / very narrow
+   (≈8–15 mm face), SILVER / brushed-aluminium finish only — never thick, ornate,
+   wooden, black, or any coloured moulding; the frame must recede so the poster's
+   simplicity leads. Portrait only; matte/anti-reflective glazing; 3 mm bleed; text
+   ≥ 43 mm from edge. Full detail: posters/FRAMING_GUIDELINES.md.
+   -------------------------------------------------------------------------- */
+.novus-poster{
+  --poster-trim: 594mm 841mm;         /* A1 portrait master */
+  --poster-dpi: 200;                  /* 4677 × 6622 px */
+  --poster-margin: 43mm;              /* left/right content margin */
+  --poster-bar-h: 8.3mm;              /* full-bleed blue baseline bar (always visible) */
+  --poster-bar-fill: var(--blue-500);
+  --poster-mount-pct: 8.5%;           /* mount border = 8.5% of print short edge */
+  --poster-mount-a1: 50mm; --poster-mount-a2: 36mm; --poster-mount-a3: 25mm;
+  --poster-frame-face: 8mm 15mm;      /* slim frame; SILVER / brushed-aluminium only, never coloured/thick */
+  /* type scale at A1 */
+  --poster-lockup: 125pt;  --poster-headline: 98pt;   --poster-stat: 57pt;
+  --poster-closing: 44pt;  --poster-lede: 40pt;       --poster-cap-title: 35pt;
+  --poster-eyebrow: 32pt;  --poster-slogan: 32pt;     --poster-section-eyebrow: 24pt;
+  --poster-cap-detail: 25pt; --poster-footer: 20pt;
+}
