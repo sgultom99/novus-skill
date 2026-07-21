@@ -3,3 +3,5 @@
 - [Skills & marketplace](project_skills.md) — six TDD-verified skills; repo doubles as
   plugin marketplace `novustech` / plugin `novus-skills`; novus-design-system bundles
   the 2026-07-07 tokens+fonts snapshot.
+- [Content policy](project_content-policy.md) — LOCKED: shared docs/skills stay
+  general/international; banned-terms grep to run before every publish.

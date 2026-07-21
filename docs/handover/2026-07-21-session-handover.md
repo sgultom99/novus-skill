@@ -2,53 +2,50 @@
 
 ## Where we are
 
-The repo is live at `github.com:sgultom99/novus-skill.git` (main @ `17dfa5d`) and now
-serves three roles at once: teammate playbook (README, PROMPTS, BUSINESS-USER-CHECKLIST),
-skill source (`skills/`, six TDD-verified skills), and installable Claude Code plugin
-marketplace (marketplace `novustech`, plugin `novus-skills`, no version field so every
-push is a new version). All six skills are also installed locally in `~/.claude/skills/`.
+Repo fully pushed (`main` @ `a3295f3`, working tree clean) and serving three roles:
+teammate playbook (README, PROMPTS, BUSINESS-USER-CHECKLIST), skill source (`skills/`,
+six TDD-verified skills), and installable plugin marketplace (`novustech` /
+`novus-skills`, versionless = every push is a new version). All shared content is now
+**general and international** — no product brands, no country/persona/locale specifics,
+no portfolio or session-history provenance, no personal benchmark products (see
+`memory/project_content-policy.md`).
 
 ## Done this session
 
-- Generalized the five original skills (brand/product/market terms removed, grep-verified)
-  and strengthened each: time-short minimum handover, persona skeleton + score-delta,
-  CSS tokens + accessibility floor, secret-shaped-strings scan list, required final-reply
-  shape for handoff. Three simulation verifications passed (`skills/*/SKILL.md`).
-- Pushed the repo to GitHub (root commit `0161c85`; GitHub host keys verified by
-  fingerprint before first push).
-- Built `novus-design-system` (`skills/novus-design-system/`): locked values/behaviors
-  distilled from the design-system SharePoint kit, bundled `tokens.css` + Carlito woff2
-  snapshot (2026-07-07). Fetched via `az` + Microsoft Graph — the M365 tenant
-  (`1c50ab90…`) needs an explicit `--tenant` token; the default az tenant fails with
-  "Tenant does not have a SPO license". Full TDD: RED (agent invented a parallel brand),
-  GREEN pass, one loophole ("not SaaS" tagline) closed and re-tested.
-- Made the repo a plugin marketplace (`.claude-plugin/marketplace.json` + `plugin.json`,
-  `claude plugin validate .` passes) — commit `cc3ec72`.
-- Rewrote README §6 around the marketplace install with per-skill use cases + examples;
-  updated stack table, setup step, and the business-user checklist — commit `17dfa5d`.
+- Generalized + strengthened the five original skills (three sim verifications passed).
+- Built `novus-design-system` (`skills/novus-design-system/`) from the design-system
+  SharePoint kit with bundled `tokens.css` + Carlito snapshot (2026-07-07); full TDD
+  incl. one closed loophole ("not SaaS" tagline).
+- Made the repo a plugin marketplace (`.claude-plugin/`, `claude plugin validate` OK)
+  and documented install + per-skill use cases in README §6.
+- Dropped the AWS plugin from setup; `telegram` + `frontend-design` marked optional.
+- Content scrub across README/PROMPTS/skills (commits `11ad7d5`…`a3295f3`): neutral
+  intro, fictional §8 examples, internationalized personas, "fintech" removed,
+  detailed five-slot goal prompt (§4 ②) with domain-generic benchmark guidance and
+  worked banking/card examples.
 
 ## Verify
 
 - [ ] End-to-end marketplace test from a fresh session:
       `/plugin marketplace add sgultom99/novus-skill` →
       `/plugin install novus-skills@novustech` → skills fire. Never run live.
-- [ ] GitHub repo visibility is **private** — it now contains internal branding, design
-      tokens, and the SharePoint location.
+- [ ] GitHub repo visibility is **private** (internal branding + SharePoint path
+      inside `novus-design-system`).
 
 ## Open items
 
-- **Credential rotation (urgent, user-side):** old session transcripts under
-  `~/.claude/projects/` hold pasted Cloudflare/GitLab/Vault/Telegram/Midtrans tokens —
-  all still flagged as burned; rotate them.
-- **`git push` is blocked for Claude** by the auto-mode permission classifier — Santo
-  pushes with `! git push`. Optionally add a Bash allow rule for `git push` in settings.
-- **Design-system snapshot drift:** the bundled tokens/fonts are the 2026-07-07 snapshot;
-  refresh from the SharePoint master (owner: Rick) when the kit changes, and bump the
-  date in the skill.
+- **Credential rotation (urgent, user-side):** old transcripts under
+  `~/.claude/projects/` still hold burned tokens — rotate.
+- **`git push` blocked for Claude** by the permission classifier — Santo runs
+  `! git push`; optionally add a Bash allow rule.
+- **Design-system snapshot drift:** bundled tokens/fonts are the 2026-07-07 snapshot;
+  refresh from the SharePoint master (owner: Rick) and re-date when the kit changes.
 
 ## Next session: start here
 
-1. Run the end-to-end marketplace install test from a fresh session (Verify box 1).
-2. Confirm the GitHub repo is private (Verify box 2).
-3. When teammates onboard, collect their friction points on the skills/playbook and
-   iterate — the plugin means fixes reach them on the next `marketplace update`.
+1. Run the end-to-end marketplace install test from a fresh session.
+2. Confirm the GitHub repo is private.
+3. Before publishing ANY doc/skill change, run the banned-terms grep in
+   `memory/project_content-policy.md`.
+4. When teammates onboard, collect friction points and iterate — fixes reach them via
+   `/plugin marketplace update novustech`.
