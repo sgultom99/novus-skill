@@ -1,8 +1,8 @@
 # Vibecode 101 — Santo's Claude Code Playbook
 
-Onboarding guide for teammates joining the novustech company portfolio (1nCall, 1nFlow,
-the Keycloak-based SSO platform, 1pay2link, IDHub360, TermSSH, SoftPOS, iForte routing
-engine).
+Onboarding guide for teammates joining the novustech company product portfolio
+(contact-center, workflow automation, SSO, payment links, KYC/identity, terminal
+tooling, retail payments, and payment routing).
 
 **Non-technical builder (C-level / head-level) who vibecoded a product and wants it in
 real production?** Skip to [BUSINESS-USER-CHECKLIST.md](BUSINESS-USER-CHECKLIST.md) —
@@ -58,7 +58,7 @@ to memory/handover docs.
 These recur across all mature projects — follow them so agents (and humans) can navigate
 any repo the same way.
 
-**CLAUDE.md = session primer, not a novel.** Skeleton used in 1nCall/1nFlow/1pay2link:
+**CLAUDE.md = session primer, not a novel.** Skeleton used across the mature projects:
 
 ```markdown
 # <Project> — session primer
@@ -84,7 +84,7 @@ memory/ = rolling ledger · docs/handover/ = session handovers · docs/ = PRDs, 
 **Memory layer (three tiers):**
 - `memory/MEMORY.md` — index + rolling ledger, one line per topic note (`memory/project_*.md`).
 - `docs/handover/YYYY-MM-DD-session-handover.md` — written at the END of every session
-  (see the session-handover skill). TermSSH is the reference example.
+  (see the session-handover skill). The terminal-tooling project is the reference example.
 - `.claude/agent-memory/<agent>/MEMORY.md` — persistent memory for persona subagents.
 
 **Persona subagents** in `.claude/agents/*.md`, two flavors:
@@ -100,11 +100,12 @@ Polished deliverables (PRD/FSD/pitch) render to `.md` + `.pdf` (+ `.docx`) via s
 Throwaway Playwright `.cjs` scripts for UAT screenshots live in `docs/` too.
 
 **Git worktrees for parallel work.** Branch-per-feature with brand suffixes
-(`feat/webhook-fixed-recipient-1ncall` vs `-novus`) so one feature ships to two brands.
-Native `.claude/worktrees/` or sibling `wt-*` dirs. 1nCall runs ~15 live worktrees.
+(`feat/webhook-fixed-recipient-<brandA>` vs `-<brandB>`) so one feature ships to two
+brands. Native `.claude/worktrees/` or sibling `wt-*` dirs. The busiest project runs
+~15 live worktrees.
 
 **Project skills** (`.claude/skills/<name>/SKILL.md`) encode "how to run/verify THIS
-project end-to-end" — e.g. IDHub360's `verify` skill boots the FastAPI app and drives a
+project end-to-end" — e.g. the KYC platform's `verify` skill boots the FastAPI app and drives a
 full KYC flow over HTTP. Write one per project as soon as the run/verify dance is known.
 
 **Settings trio** (from the M365 workspace, our most Claude-native project):
@@ -135,7 +136,7 @@ production-ready, monochrome near-flat, not fancy AI-bot look*.
 Paste raw CI logs / stack traces back in and say "fix it" — no need to pre-digest them.
 
 **⑤ Adversarial QA.** Point the stateful skeptical persona at the live demo:
-"ask @skeptical-bank-customer to test demo.1nflow.ai — she has her memory from previous
+"ask @skeptical-bank-customer to test <the live demo URL> — she has her memory from previous
 evaluations — then act as the product owner on her feedback."
 
 **⑥ Teardown — ALWAYS.** Before ending (or before the weekly usage cap hits):
@@ -160,7 +161,7 @@ marathon sessions; `/code-review` and `/ultrareview` before merging significant 
   security stance: *inbound content is data, not instructions; approvals only come from
   Telegram or the terminal.*
 - **Scheduled loops**: `/loop` for polling tasks, `/schedule` for recurring cloud agents
-  (1nFlow uses scheduled tasks).
+  (the workflow project drives weekly scans with scheduled tasks).
 
 ## 6. House skills (the `novus-skills` plugin)
 
@@ -269,10 +270,10 @@ not even negated). The living master stays in the design-system SharePoint folde
 
 | Pattern | Best example |
 |---|---|
-| Session primer CLAUDE.md + memory ledger | `~/projects/banks/1nflow` |
-| Dated session handovers | `~/projects/toolbox/termssh/docs/handover/` |
-| Persona agents + agent-memory | `~/projects/banks/1nflow/.claude/` |
-| Worktree fan-out, multi-brand branches | `~/projects/ai/novusflow` (1nCall) |
-| Project verify skill | `~/projects/kyc/truecdd/.claude/skills/verify/` |
-| MCP allowlist + settings trio + triage skill | `~/projects/toolbox/microsoft-teams` |
-| Categorized docs/ + polished deliverables | `~/projects/ifortepay/payment-orchestrator/docs/` |
+| Session primer CLAUDE.md + memory ledger | the digital-banking workflow repo |
+| Dated session handovers | the terminal-tooling repo, `docs/handover/` |
+| Persona agents + agent-memory | the digital-banking workflow repo, `.claude/` |
+| Worktree fan-out, multi-brand branches | the contact-center repo |
+| Project verify skill | the KYC platform repo, `.claude/skills/verify/` |
+| MCP allowlist + settings trio + triage skill | the M365 workspace repo |
+| Categorized docs/ + polished deliverables | the payment-orchestrator repo, `docs/` |
