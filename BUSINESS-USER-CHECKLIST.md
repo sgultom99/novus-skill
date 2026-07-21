@@ -19,8 +19,10 @@ can pick up the folder and ship it. If a box is not ticked, that becomes a meeti
 - [ ] Effort: `/effort` → high.
 - [ ] Plugins (one time): `superpowers` (plan → build → review process),
       `frontend-design` (UI quality). See README §2 for install commands.
-- [ ] House skills copied from this repo's `skills/` into `~/.claude/skills/` —
-      especially `session-handover` (saves your progress for the next session) and
+- [ ] House skills installed from this repo's marketplace:
+      `/plugin marketplace add sgultom99/novus-skill` then
+      `/plugin install novus-skills@novustech` — especially important for you:
+      `session-handover` (saves your progress for the next session) and
       `secret-hygiene` (protects you from leaking credentials).
 - [ ] MCP servers: only add what the product truly needs. Every MCP server you add is
       something DevOps must also install — write down each one you add and why.

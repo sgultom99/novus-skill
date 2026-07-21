@@ -24,7 +24,7 @@ shipped projects (June–July 2026). Copy this setup and you inherit the whole w
 | Messaging | **telegram** plugin (MCP bridge, human-in-the-loop approvals) | plugin + `~/.claude/channels/telegram/` |
 | Cloud | **aws-startup-advisor** plugin (2 MCP servers: AWS knowledge + pricing) | plugin |
 | Memory | per-project `memory/MEMORY.md` ledgers + `.claude/agent-memory/` + handover docs | in each repo |
-| Skills | 5 house skills distilled from real history (section 6) | `~/.claude/skills/` |
+| Skills | 6 house skills distilled from real history (section 6) | `novus-skills` plugin from this repo's marketplace |
 
 Key insight: **the "house style" is enforced by plugins and skills, not by a giant
 CLAUDE.md.** Project CLAUDE.md files stay tiny ("session primers") and delegate history
@@ -43,7 +43,11 @@ to memory/handover docs.
 3. In `~/.claude/settings.json` set effort high and (optionally) the ponytail statusline.
    Ponytail default mode is `full`; switch with `/ponytail lite|full|ultra`, disable with
    "stop ponytail".
-4. Copy the `skills/` directory from this repo into `~/.claude/skills/` (section 6).
+4. Install the house skills from this repo's own marketplace (section 6):
+   ```
+   /plugin marketplace add sgultom99/novus-skill
+   /plugin install novus-skills@novustech
+   ```
 5. Telegram (optional): `/telegram:configure` with your own bot token, approve yourself
    via `/telegram:access`. Never share the bot token.
 6. Per machine, permissions accumulate in `~/.claude/settings.local.json` and per-project
@@ -158,22 +162,94 @@ marathon sessions; `/code-review` and `/ultrareview` before merging significant 
 - **Scheduled loops**: `/loop` for polling tasks, `/schedule` for recurring cloud agents
   (1nFlow uses scheduled tasks).
 
-## 6. House skills (in this repo under `skills/`, install to `~/.claude/skills/`)
+## 6. House skills (the `novus-skills` plugin)
 
-The copies in `skills/` are **general-purpose** — no company, product, or market
-specifics — so they can be shared beyond the team and dropped into any project as-is.
+This repo doubles as a Claude Code **plugin marketplace**. One-time install:
+
+```
+/plugin marketplace add sgultom99/novus-skill
+/plugin install novus-skills@novustech
+```
+
+Updates flow with every push — pick them up with `/plugin marketplace update novustech`
+(or enable auto-update in `/plugin` → Marketplaces). Manual fallback: copy `skills/*`
+into `~/.claude/skills/` — but the plugin is preferred, it stays in sync and never
+collides with skills you already have (plugin skills are namespaced).
+
+Five skills are **general-purpose** (no company/product/market specifics — shareable
+beyond the team); `novus-design-system` is deliberately branded.
 
 | Skill | Fires when | What it fixes |
 |---|---|---|
 | `session-handover` | "save session/handover", "learn this project first" | Standard handover format + file locations, so any fresh session resumes in one read |
 | `skeptical-evaluator` | "skeptical customer / persona QA / brutal feedback" | Stateful adversarial persona with persistent agent-memory instead of one-off roleplay |
-| `enterprise-ui` | any UI work in our projects | Monochrome near-flat Ant-Design-grade UI; kills AI-slop (gradients, big radius, leftover Chinese template text, broken mobile) |
+| `enterprise-ui` | any enterprise/back-office UI work | Monochrome near-flat Ant-Design-grade UI; kills AI-slop (gradients, big radius, leftover template text, broken mobile) |
 | `secret-hygiene` | a live credential appears in chat/logs/files | Never echo secrets; env/Vault refs; flag for rotation |
 | `production-handoff` | "prepare handoff to DevOps", "get this to production" | The fixed handoff-package shape (PRD, environment recipe, demo-vs-real, services+owners, .env.example) + secret scans; never claims production-ready |
+| `novus-design-system` | any Novus-branded frontend or `nova*` product UI | Wires the real design system (bundled `tokens.css` + Carlito) instead of an invented palette; locked logo/dark-mode/wording rules |
 
-(A sixth skill, `merge-and-deploy`, was tested and dropped: baseline agents already run
-the full ship loop correctly — push → MR → CI green → merge → watch pipeline → verify
-live before reporting done. The expectation is documented in section 4; no skill needed.)
+(A seventh candidate, `merge-and-deploy`, was tested and dropped: baseline agents
+already run the full ship loop correctly — push → MR → CI green → merge → watch
+pipeline → verify live before reporting done. Documented in section 4; no skill needed.)
+
+### Use cases & examples
+
+**`session-handover` — never lose a session again.**
+End every session (or when the usage cap looms) with:
+> Save the session: handover doc + memory update so a fresh session can continue.
+
+Claude writes ONE dated `docs/handover/YYYY-MM-DD-session-handover.md` (Where we are /
+Done / Verify / Open items / Next session: start here) and updates the `memory/MEMORY.md`
+ledger. Next session, open with *"Learn this project first"* — it reads CLAUDE.md →
+memory → newest handover and tells you where you left off. Under time pressure it writes
+the two essential sections rather than nothing.
+
+**`skeptical-evaluator` — QA that remembers being burned.**
+First run:
+> Create a skeptical customer persona to test https://demo.example.com (login demo/demo)
+> and give brutal feedback. She must remember her evaluations across sessions.
+
+Claude creates `.claude/agents/<persona>.md` grounded in your actual buyer (name, role,
+institution, market) and append-only memory in `.claude/agent-memory/<persona>/MEMORY.md`.
+Repeat runs (*"this is her 4th evaluation — read her memory first"*) re-check every
+"still broken" item before hunting new findings, and score /10 with a delta — the trend
+line across runs is the real QA signal.
+
+**`enterprise-ui` — enterprise looks, not AI-bot looks.**
+Just build UI; the skill applies itself. Ask for *"a settlement reconciliation dashboard"*
+and you get solid neutral grounds, ≤6px radius, 1px borders over shadows, one accent,
+compact density — plus a ship checklist run before "done": grep for gradients and
+leftover CJK template text, 375px mobile pass, radius audit, contrast ≥4.5:1 with
+visible focus states.
+
+**`secret-hygiene` — a pasted secret is a burned secret.**
+Paste a token mid-task (it happens) and Claude stages it as an in-shell env var, never
+echoes it back, and ends the task with an explicit rotation flag — because everything
+typed in chat is stored in plaintext transcripts forever. Also fires on scans: it knows
+the secret-shaped strings to look for (`ghp_`, `glpat-`, `sk_live_`, `AKIA`, private-key
+blocks, JWTs, `user:password@` URLs).
+
+**`production-handoff` — from vibecoded prototype to something DevOps can ship.**
+> Prepare the production handoff package for my engineers.
+
+Builds the full 6-artifact package (README/CLAUDE.md hygiene check, DRAFT PRD for owner
+review, `docs/handoff/environment.md` with the exact model/plugins/skills/MCP recipe,
+`demo-vs-real.md` worst-first, `services.md` with an owner slot per account,
+`.env.example` names-only), scans working tree + git history + chat for secrets, and
+closes by saying what YOU must do next — and that engineering, not Claude, declares it
+production-ready.
+
+**`novus-design-system` — on-brand Novus frontends, zero guessing.**
+> Build the novapay merchant dashboard with dark mode.
+
+Instead of inventing a palette, Claude copies the bundled `tokens.css` + Carlito fonts
+(snapshot 2026-07-07) into the project and derives everything from `var(--…)` tokens and
+the shipped component classes. Locked behaviors enforced: dual-trigger dark mode
+(toggle + OS) with the logo swapping to white, placed logo assets (never a typed
+"NOVUS"), lowercase solid-set product names, hover only on clickables, mobile-first
+375px/44px floors, and "Service as Software" wording (the word "SaaS" never appears —
+not even negated). The living master stays in the design-system SharePoint folder
+(owner: Rick) — the skill tells Claude where to fetch fresh copies.
 
 ## 7. Security — read this twice
 
