@@ -268,12 +268,15 @@ not even negated). The living master stays in the design-system SharePoint folde
 
 ## 8. Where to look for living examples
 
-| Pattern | Best example |
+Illustrative layout only — the repo names below are made up. Every mature novustech
+project follows these patterns; ask Santo which internal repo best demonstrates each.
+
+| Pattern | What it looks like |
 |---|---|
-| Session primer CLAUDE.md + memory ledger | the digital-banking workflow repo |
-| Dated session handovers | the terminal-tooling repo, `docs/handover/` |
-| Persona agents + agent-memory | the digital-banking workflow repo, `.claude/` |
-| Worktree fan-out, multi-brand branches | the contact-center repo |
-| Project verify skill | the KYC platform repo, `.claude/skills/verify/` |
-| MCP allowlist + settings trio + triage skill | the M365 workspace repo |
-| Categorized docs/ + polished deliverables | the payment-orchestrator repo, `docs/` |
+| Session primer CLAUDE.md + memory ledger | `~/projects/banking-suite/CLAUDE.md` + `memory/MEMORY.md` |
+| Dated session handovers | `~/projects/ops-console/docs/handover/2026-07-19-session-handover.md` |
+| Persona agents + agent-memory | `~/projects/banking-suite/.claude/agents/` + `.claude/agent-memory/` |
+| Worktree fan-out, multi-brand branches | `~/projects/omni-dialer` with `wt-*` siblings, `feat/<feature>-<brand>` branches |
+| Project verify skill | `~/projects/kyc-portal/.claude/skills/verify/SKILL.md` |
+| MCP allowlist + settings trio + triage skill | `~/projects/team-workspace/.claude/settings.json` + `settings.suggested.json` |
+| Categorized docs/ + polished deliverables | `~/projects/payment-hub/docs/deploy/`, `docs/security/`, `docs/handover/` |
